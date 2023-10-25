@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <link rel="stylesheet" type="text/css" href="styles.css">
+    <meta charset="UTF-8">
+    <title> Creating </title>
+</head>
+
+<body>
+<div class="links">
+    <a href="/task/all">List of tasks</a>
+    <a href="/task/new">New task</a>
+    <a href="/task/update/1">Change task</a>
+    <!-- <a href="/admin/task/1">Delete task</a> -->
+</div>
+
+<h3> Task creating </h3>
+<div class="content">
+
+    <form action="/task/new" method="POST">
+        <div class="task_setting">
+            <label for="type"> Task type: </label>
+            <select id="type" name="type">
+                <option value="1">From Ru to En</option>
+                <option value="2">From En to Ru</option>
+                <option value="3">Fill gaps</option>
+            </select>
+        </div>
+        <div class="task_setting">
+            <label for="level">Level:</label>
+            <select id="level" name="level">
+                <option value="A0"> A0 </option>
+                <option value="A1"> A1 </option>
+                <option value="A2"> A2 </option>
+                <option value="B1"> B1 </option>
+                <option value="B2"> B2 </option>
+                <option value="C1"> C1 </option>
+            </select>
+        </div>
+        <div class="task_setting">
+            <label for="question">Question:</label>
+            <input type="text" id="question" name="question" required>
+        </div>
+        <div class="task_setting">
+            <label for="answer">Answer:</label>
+            <input type="text" id="answer" name="answer" required>
+        </div>
+        <button type="submit"> Save </button>
+    </form>
+    </div>
+</body>

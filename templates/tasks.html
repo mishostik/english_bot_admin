@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="">
+<head>
+  <title>Tasks</title>
+</head>
+<body>
+<h1>Tasks</h1>
+<ul>
+  {{range .}}
+  <li>
+    <strong>Type ID:</strong> {{.TypeID}} <br>
+    <strong>Level:</strong> {{.Level}} <br>
+    <strong>Question:</strong> {{.Question}} <br>
+    <strong>Answer:</strong> {{.Answer}} <br>
+  </li>
+  {{end}}
+</ul>
+</body>
+</html>
