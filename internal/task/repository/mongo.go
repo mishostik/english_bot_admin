@@ -2,9 +2,10 @@ package task
 
 import (
 	"context"
-	model "english_bot_admin/internal/task/model"
+	model "english_bot_admin/internal/task/models"
 	"errors"
 	"fmt"
+	"github.com/google/uuid"
 	"log"
 
 	"go.mongodb.org/mongo-driver/bson"
@@ -44,8 +45,8 @@ func (mr *MongoTaskRepository) GetTasks(ctx context.Context) ([]model.Task, erro
 	return tasks, nil
 }
 
-func (mr *MongoTaskRepository) GetTaskByID(ctx context.Context, taskID int) (*model.Task, error) {
-	filter := bson.M{"task_id": taskID}
+func (mr *MongoTaskRepository) GetTaskByID(ctx context.Context, taskID uuid.UUID) (*model.Task, error) {
+	filter := bson.M{"_id": taskID}
 	var task model.Task
 	err := mr.taskCollection.FindOne(ctx, filter).Decode(&task)
 	if err != nil {
@@ -58,30 +59,39 @@ func (mr *MongoTaskRepository) GetTaskByID(ctx context.Context, taskID int) (*mo
 	return &task, err
 }
 
-func (mr *MongoTaskRepository) NewTask(ctx context.Context, task *model.Task) error {
+func (mr *MongoTaskRepository) NewTask(ctx context.Context, task *model.Task) (uuid.UUID, error) {
 	_, err := mr.taskCollection.InsertOne(ctx, task)
 	if err != nil {
-		return fmt.Errorf("error while adding task: %w", err)
+		return uuid.Nil, fmt.Errorf("error while adding task: %w", err)
 	}
-	log.Println("task added")
-	return nil
-}
 
-func (mr *MongoTaskRepository) UpdateTask(ctx context.Context, taskID int, task *model.Task) error {
-	filter := bson.M{"task_id": taskID}
+	//// Возвращаете ObjectID, сгенерированный MongoDB
+	//insertedID, ok := result.InsertedID.(primitive.ObjectID)
+	//if !ok {
+	//	return 0, fmt.Errorf("error while getting ObjectID")
+	//}
+
+	log.Printf("Task added with ID: %s\n", task.TaskID)
+
+	return task.TaskID, nil
+}
+func (mr *MongoTaskRepository) UpdateTaskUUID(ctx context.Context, task *model.Task) error {
+	filter := bson.M{"question": task.Question}
 	update := bson.M{
 		"$set": bson.M{
 			"type_id":  task.TypeID,
 			"level":    task.Level,
 			"question": task.Question,
 			"answer":   task.Answer,
+			"task_id":  task.TaskID,
 		},
 	}
+
 	_, err := mr.taskCollection.UpdateOne(ctx, filter, update)
 	if err != nil {
-		log.Println("error while updating task:", err)
 		return err
 	}
+
 	return nil
 }
 
@@ -92,4 +102,24 @@ func (mr *MongoTaskRepository) DeleteTask(ctx context.Context, taskID int) error
 		return err
 	}
 	return nil
+}
+
+func (mr *MongoTaskRepository) GetTasksWithoutUUID(ctx context.Context) ([]model.Task, error) {
+	filter := bson.M{"task_id": nil}
+	var tasks []model.Task
+
+	cursor, err := mr.taskCollection.Find(ctx, filter)
+	if err != nil {
+		return nil, err
+	}
+
+	defer func() {
+		_ = cursor.Close(ctx)
+	}()
+
+	if err := cursor.All(ctx, &tasks); err != nil {
+		return nil, err
+	}
+
+	return tasks, nil
 }

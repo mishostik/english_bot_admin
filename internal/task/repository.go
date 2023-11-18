@@ -1,7 +1,7 @@
 package task
 
 import (
-	model "english_bot_admin/internal/task/model"
+	model "english_bot_admin/internal/task/models"
 )
 
 type Repository interface {

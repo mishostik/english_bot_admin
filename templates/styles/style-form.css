@@ -53,6 +53,28 @@
 /*    width: 500px;*/
 /*}*/
 
+/* Стилизация ссылки как кнопки */
+/*a.button {*/
+/*    display: inline-block;*/
+/*    padding: 10px 20px; !* Задайте желаемый размер *!*/
+/*    background-color: #007bff; !* Задайте желаемый цвет фона *!*/
+/*    color: #fff; !* Задайте цвет текста *!*/
+/*    text-decoration: none; !* Удалите подчеркивание ссылки *!*/
+/*    border: 1px solid #007bff; !* Задайте рамку кнопки *!*/
+/*    border-radius: 5px; !* Задайте скругленные углы *!*/
+/*    text-align: center;*/
+/*}*/
+
+/*!* Добавьте стили для наведения *!*/
+/*a.button:hover {*/
+/*    background-color: #0056b3; !* Измените цвет фона при наведении *!*/
+/*}*/
+
+/*!* Добавьте стили для активации (когда кнопка нажата) *!*/
+/*a.button:active {*/
+/*    background-color: #003c80; !* Измените цвет фона при активации *!*/
+/*}*/
+
 
 input {
     /*right: 10px;*/
@@ -146,4 +168,48 @@ body {
     color: #ffffff;
     text-decoration: none;
     margin-right: 10px;
+}
+
+
+.task-container {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.task {
+    display: flex;
+    flex-direction: column;
+    /*width: 30%;*/
+    margin: 10px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    width: 350px;
+    word-wrap: break-word;
+}
+
+.refresh-button {
+    background-color: #145faf;
+    color: #fff;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+    margin-top: 20px;
+}
+
+.refresh-button:hover {
+    background-color: #0056b3;
+}
+
+p {
+    /*width: 100px;*/
+    color: #68b6b3;
+    font-weight: bold;
+    /*display: inline-block;*/
+}
+
+.span-wrap{
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
 }

@@ -8,7 +8,10 @@ require (
 	go.mongodb.org/mongo-driver v1.12.1
 )
 
-require github.com/gorilla/schema v1.1.0 // indirect
+require (
+	github.com/gorilla/schema v1.1.0 // indirect
+	github.com/satori/go.uuid v1.2.0 // indirect
+)
 
 require (
 	github.com/andybalholm/brotli v1.0.5 // indirect

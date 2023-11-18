@@ -1,24 +1,21 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <link rel="stylesheet" type="text/css" href="/style-form.css">
     <meta charset="UTF-8">
-    <title> Creating </title>
+    <title>Editing Task</title>
 </head>
-
-<body>
+<!--<body style="background-color: #4072a6">-->
 <div class="links">
     <a href="/task/all">List of tasks</a>
     <a href="/task/new">New task</a>
 </div>
 
-<h3> Task creating </h3>
+<h3>Editing Task {{ .TaskID }}</h3>
 <div class="content">
-
-    <form action="/task/new" method="POST">
+    <form action="/task/edit/{{.TaskID}}" method="POST">
         <div class="task_setting">
-            <label for="type"> Task type: </label>
+            <label for="type">Task type:</label>
             <select id="type" name="type">
                 <option value="1">From Ru to En</option>
                 <option value="2">From En to Ru</option>
@@ -28,32 +25,33 @@
         <div class="task_setting">
             <label for="level">Level:</label>
             <select id="level" name="level">
-                <option value="A0"> A0 </option>
-                <option value="A1"> A1 </option>
-                <option value="A2"> A2 </option>
-                <option value="B1"> B1 </option>
-                <option value="B2"> B2 </option>
-                <option value="C1"> C1 </option>
+                <option value="A0">A0</option>
+                <option value="A1">A1</option>
+                <option value="A2">A2</option>
+                <option value="B1">B1</option>
+                <option value="B2">B2</option>
+                <option value="C1">C1</option>
             </select>
         </div>
         <div class="task_setting">
             <label for="question">Question:</label>
-            <input type="text" id="question" name="question" required>
+            <input type="text" id="question" name="question" required value="{{ .Task.Question }}">
         </div>
         <div class="task_setting">
             <label for="answer">Answer:</label>
-            <input type="text" id="answer" name="answer" required>
+            <input type="text" id="answer" name="answer" required value="{{ .Task.Answer }}">
         </div>
-        <p> incorrect answers </p>
+        <p>incorrect answers</p>
         <div class="task_setting">
             <label for="incorrectA">Incorrect Answer (1):</label>
-            <input type="text" id="incorrectA" name="incorrectA" required>
+            <input type="text" id="incorrectA" name="incorrectA" required value="{{ .IncorrectA }}">
             <label for="incorrectB">Incorrect Answer (2):</label>
-            <input type="text" id="incorrectB" name="incorrectB" required>
+            <input type="text" id="incorrectB" name="incorrectB" required value="{{ .IncorrectB }}">
             <label for="incorrectC">Incorrect Answer (3):</label>
-            <input type="text" id="incorrectC" name="incorrectC" required>
+            <input type="text" id="incorrectC" name="incorrectC" required value="{{ .IncorrectC }}">
         </div>
-        <button type="submit"> Save </button>
+        <button type="submit">Save</button>
     </form>
-    </div>
+</div>
 </body>
+</html>

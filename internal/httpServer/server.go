@@ -24,9 +24,16 @@ func (s *Server) Run() error {
 	var (
 		err error
 	)
-	s.app.Static("/task", "../templates")
-	s.app.Get("/task/new", func(c *fiber.Ctx) error {
-		return c.Render("../templates/create_task.html", fiber.Map{})
+	s.app.Static("/", "./templates/styles")
+	s.app.Get("/task/new", func(c *fiber.Ctx) error { // УБРАТЬ ВСЕ РУТЫ В РУТЫ ЕБАНА
+		return c.Render("templates/create_task.html", fiber.Map{})
+	})
+	s.app.Get("/task/edit/:id", func(c *fiber.Ctx) error { // УБРАТЬ ЭТО ОТСЮДА НАХУЙ
+		// TODO здесь нифига не передается данных , потому и NO VALUE
+		return c.Render("templates/edit_task.html", fiber.Map{})
+	})
+	s.app.Get("", func(c *fiber.Ctx) error {
+		return c.Render("templates/base.html", fiber.Map{})
 	})
 
 	err = godotenv.Load(".env")
@@ -45,7 +52,8 @@ func (s *Server) Run() error {
 
 	taskCollection, err := db.Collection("tasks")
 	typeCollection, err := db.Collection("task_types")
-	handler := taskHttp.NewTaskHandler(taskCollection, typeCollection)
+	incorrectAnswers, err := db.Collection("incorrect_answers")
+	handler := taskHttp.NewTaskHandler(taskCollection, typeCollection, incorrectAnswers)
 	taskHttp.TaskRoutes(s.app, handler)
 
 	err = s.app.Listen(":3000")

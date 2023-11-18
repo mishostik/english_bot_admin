@@ -1,19 +1,29 @@
 <!DOCTYPE html>
-<html lang="">
+<html lang="en">
 <head>
+  <link rel="stylesheet" type="text/css" href="/style-form.css">
+  <meta charset="UTF-8">
   <title>Tasks</title>
 </head>
 <body>
+<div class="links">
+  <a href="/task/all">List of tasks</a>
+  <a href="/task/new">New task</a>
+</div>
 <h1>Tasks</h1>
-<ul>
-  {{range .}}
-  <li>
-    <strong>Type ID:</strong> {{.TypeID}} <br>
-    <strong>Level:</strong> {{.Level}} <br>
-    <strong>Question:</strong> {{.Question}} <br>
-    <strong>Answer:</strong> {{.Answer}} <br>
-  </li>
-  {{end}}
-</ul>
+<div class="task-container">
+  {{ range .Tasks }}
+    <div class="task">
+    <div class="span-wrap">
+      <span><p>TypeID:</p> {{ .TypeID }} </span>
+      <span><p>Level:</p> {{ .Level }} </span>
+      <span><p>Question:</p> {{ .Question }} </span>
+      <span><p>Answer:</p> {{ .Answer }} </span>
+    </div>
+<!--    <button class="refresh-button">Обновить</button>-->
+    <a href="/task/edit/{{.TaskID}}" class="edit-link"> edit </a>
+  </div>
+  {{ end }}
+</div>
 </body>
 </html>
