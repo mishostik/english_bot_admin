@@ -2,6 +2,7 @@ package http
 
 import (
 	"bytes"
+	"english_bot_admin/internal/incorrect/models"
 	incr "english_bot_admin/internal/incorrect/repository"
 	model "english_bot_admin/internal/task/models"
 	tr "english_bot_admin/internal/task/repository"
@@ -75,40 +76,54 @@ func (h *TaskHandler) GetTasks(ctx *fiber.Ctx) error {
 }
 
 func (h *TaskHandler) EditTask(ctx *fiber.Ctx) error {
-	log.Println("editing...")
+	var errorMessage string = "Task updated successfully"
 	context_ := ctx.Context()
-	id_ := ctx.Params("id")
-	uuid_, err := uuid.Parse(id_)
-	log.Println("task uuid -", uuid_)
+	uuid_ := ctx.FormValue("task_id")
+	taskUuid, err := uuid.Parse(uuid_)
 	if err != nil {
+		errorMessage = "Parsing uuid error"
 		return err
 	}
-	task, err := h.taskRepo.GetTaskByID(context_, uuid_)
+	taskType := ctx.FormValue("type")
+	level := ctx.FormValue("level")
+	question := ctx.FormValue("question")
+	answer := ctx.FormValue("answer")
+	taskTypeInt, err := strconv.Atoi(taskType)
 	if err != nil {
-		log.Println("задачи нет по uuid")
-		return err
+		errorMessage = "Error task type converting to integer"
 	}
-	if task == nil {
-		log.Panic("задачи для редактирования нет")
+	editTask := &model.Task{
+		TaskID:   taskUuid,
+		TypeID:   uint8(taskTypeInt),
+		Level:    level,
+		Question: question,
+		Answer:   answer,
 	}
-	insAnswers, err := h.incAnswersRepo.GetAnswersForTask(context_, uuid_)
+
+	err = h.taskRepo.UpdateTaskInfoByUUID(context_, editTask)
 	if err != nil {
-		log.Println("Error while getting incorrect answers")
-		return err
+		errorMessage = "Updating task info error"
 	}
+
+	incAnswerA := ctx.FormValue("incorrectA")
+	incAnswerB := ctx.FormValue("incorrectB")
+	incAnswerC := ctx.FormValue("incorrectC")
+
+	incAnswers := &models.IncorrectAnswers{
+		A: incAnswerA,
+		B: incAnswerB,
+		C: incAnswerC,
+	}
+
+	err = h.incAnswersRepo.UpdateForTask(context_, taskUuid, incAnswers)
+	if err != nil {
+		errorMessage = "Updating of incorrect answers error"
+	}
+
 	data := fiber.Map{
-		"TaskID":     uuid_,
-		"Task":       task,
-		"TypeID":     task.TypeID,
-		"Level":      task.Level,
-		"Question":   task.Question,
-		"Answer":     task.Answer,
-		"IncorrectA": insAnswers.A,
-		"IncorrectB": insAnswers.B,
-		"IncorrectC": insAnswers.C,
+		"Message": errorMessage,
 	}
-	log.Println("data from db about editing task -", data)
-	return ctx.Render("templates/edit_task.html", data)
+	return ctx.Render("templates/message.html", data)
 }
 
 func (h *TaskHandler) CreateTask(ctx *fiber.Ctx) error {
@@ -146,4 +161,45 @@ func (h *TaskHandler) CreateTask(ctx *fiber.Ctx) error {
 	}
 
 	return ctx.SendString("Task created successfully!")
+}
+
+func (h *TaskHandler) GetNewTaskForm(ctx *fiber.Ctx) error {
+	return ctx.Render("templates/create_task.html", fiber.Map{})
+}
+
+func (h *TaskHandler) GetEditTaskForm(ctx *fiber.Ctx) error {
+	context_ := ctx.Context()
+	id_ := ctx.Params("id")
+	uuid_, err := uuid.Parse(id_)
+	if err != nil {
+		return err
+	}
+	task, err := h.taskRepo.GetTaskByID(context_, uuid_)
+	if err != nil {
+		return err
+	}
+	if task == nil {
+		log.Panic("задачи для редактирования нет")
+	}
+	insAnswers, err := h.incAnswersRepo.GetAnswersForTask(context_, uuid_)
+	if err != nil {
+		log.Println("Error while getting incorrect answers")
+		return err
+	}
+	data := fiber.Map{
+		"TaskID":     uuid_,
+		"Task":       task,
+		"TypeID":     task.TypeID,
+		"Level":      task.Level,
+		"Question":   task.Question,
+		"Answer":     task.Answer,
+		"IncorrectA": insAnswers.A,
+		"IncorrectB": insAnswers.B,
+		"IncorrectC": insAnswers.C,
+	}
+	return ctx.Render("templates/edit_task.html", data)
+}
+
+func (h *TaskHandler) BaseView(ctx *fiber.Ctx) error {
+	return ctx.Render("templates/base.html", fiber.Map{})
 }

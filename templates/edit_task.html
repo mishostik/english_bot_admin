@@ -5,15 +5,18 @@
     <meta charset="UTF-8">
     <title>Editing Task</title>
 </head>
-<!--<body style="background-color: #4072a6">-->
 <div class="links">
     <a href="/task/all">List of tasks</a>
     <a href="/task/new">New task</a>
 </div>
-
+<body>
 <h3>Editing Task {{ .TaskID }}</h3>
 <div class="content">
     <form action="/task/edit/{{.TaskID}}" method="POST">
+        <div class="task_setting">
+            <label for="task_id">Task ID:</label>
+            <input type="text" id="task_id" name="task_id" required value="{{ .Task.TaskID }}">
+        </div>
         <div class="task_setting">
             <label for="type">Task type:</label>
             <select id="type" name="type">

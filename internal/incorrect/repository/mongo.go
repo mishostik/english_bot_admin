@@ -34,8 +34,30 @@ func (r *IncorrectRepository) AddForNewTask(ctx context.Context, taskId uuid.UUI
 	}
 	log.Println("incorrect answers for new task added")
 	return nil
-
 }
+
+func (r *IncorrectRepository) UpdateForTask(ctx context.Context, taskId uuid.UUID, answers *models.IncorrectAnswers) error {
+	filter := bson.M{"task_id": taskId}
+	update := bson.M{
+		"$set": bson.M{
+			"a": answers.A,
+			"b": answers.B,
+			"c": answers.C,
+		},
+	}
+	res, err := r.incAnswers.UpdateOne(ctx, filter, update)
+	if err != nil {
+		return err
+	}
+	if res.ModifiedCount == 0 {
+		err := r.AddForNewTask(ctx, taskId, answers.A, answers.B, answers.C)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 func (r *IncorrectRepository) GetAnswersForTask(ctx context.Context, taskId uuid.UUID) (*models.IncorrectAnswers, error) {
 	filter := bson.M{"task_id": taskId}
 	var answers models.IncorrectAnswers

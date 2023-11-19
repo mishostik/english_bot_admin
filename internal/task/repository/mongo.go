@@ -46,7 +46,7 @@ func (mr *MongoTaskRepository) GetTasks(ctx context.Context) ([]model.Task, erro
 }
 
 func (mr *MongoTaskRepository) GetTaskByID(ctx context.Context, taskID uuid.UUID) (*model.Task, error) {
-	filter := bson.M{"_id": taskID}
+	filter := bson.M{"task_id": taskID}
 	var task model.Task
 	err := mr.taskCollection.FindOne(ctx, filter).Decode(&task)
 	if err != nil {
@@ -64,17 +64,29 @@ func (mr *MongoTaskRepository) NewTask(ctx context.Context, task *model.Task) (u
 	if err != nil {
 		return uuid.Nil, fmt.Errorf("error while adding task: %w", err)
 	}
-
-	//// Возвращаете ObjectID, сгенерированный MongoDB
-	//insertedID, ok := result.InsertedID.(primitive.ObjectID)
-	//if !ok {
-	//	return 0, fmt.Errorf("error while getting ObjectID")
-	//}
-
 	log.Printf("Task added with ID: %s\n", task.TaskID)
-
 	return task.TaskID, nil
 }
+
+func (mr *MongoTaskRepository) UpdateTaskInfoByUUID(ctx context.Context, task *model.Task) error {
+	filter := bson.M{"task_id": task.TaskID}
+	update := bson.M{
+		"$set": bson.M{
+			"type_id":  task.TypeID,
+			"level":    task.Level,
+			"question": task.Question,
+			"answer":   task.Answer,
+			"task_id":  task.TaskID,
+		},
+	}
+	_, err := mr.taskCollection.UpdateOne(ctx, filter, update)
+	if err != nil {
+		log.Println("updating task in mongo db error")
+		return err
+	}
+	return nil
+}
+
 func (mr *MongoTaskRepository) UpdateTaskUUID(ctx context.Context, task *model.Task) error {
 	filter := bson.M{"question": task.Question}
 	update := bson.M{
