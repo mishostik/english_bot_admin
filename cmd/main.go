@@ -6,5 +6,8 @@ import (
 
 func main() {
 	server := http_.NewServer()
-	server.Run()
+	err := server.Run()
+	if err != nil {
+		return
+	}
 }
