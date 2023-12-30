@@ -11,3 +11,8 @@ type Task struct {
 	Question string    `bson:"question" json:"question"`
 	Answer   string    `bson:"answer" json:"answer"`
 }
+
+type ToModule struct {
+	ModuleID uuid.UUID `json:"module_id"`
+	TaskID   uuid.UUID `json:"task_id"`
+}

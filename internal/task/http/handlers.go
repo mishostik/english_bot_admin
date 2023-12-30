@@ -2,34 +2,31 @@ package http
 
 import (
 	"bytes"
+	"english_bot_admin/internal/incorrect"
 	"english_bot_admin/internal/incorrect/models"
-	incr "english_bot_admin/internal/incorrect/repository"
-	model "english_bot_admin/internal/task/models"
-	tr "english_bot_admin/internal/task/repository"
-	uc "english_bot_admin/internal/task/usecase"
+	"english_bot_admin/internal/task"
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
-	"go.mongodb.org/mongo-driver/mongo"
 	"html/template"
 	"log"
 	"strconv"
 )
 
 type TaskHandler struct {
-	useCase        *uc.TaskUsecase
-	taskRepo       *tr.MongoTaskRepository
-	incAnswersRepo *incr.IncorrectRepository
+	useCase        task.Usecase
+	taskRepo       task.Repository
+	incAnswersRepo incorrect.Repository
 }
 
-func NewTaskHandler(taskCollection *mongo.Collection, typeCollection *mongo.Collection, incAnswers *mongo.Collection) *TaskHandler {
+func NewTaskHandler(taskUseCase task.Usecase, taskRepo task.Repository, incRepo incorrect.Repository) *TaskHandler {
 	return &TaskHandler{
-		useCase:        uc.NewTaskUsecase(),
-		taskRepo:       tr.NewMongoTaskRepository(taskCollection, typeCollection),
-		incAnswersRepo: incr.NewIncorrectRepository(incAnswers),
+		useCase:        taskUseCase,
+		taskRepo:       taskRepo,
+		incAnswersRepo: incRepo,
 	}
 }
 
-func RenderTasks(ctx *fiber.Ctx, tasks []model.Task) {
+func RenderTasks(ctx *fiber.Ctx, tasks []task.Task) {
 	tmpl, err := template.ParseFiles("templates/tasks.html")
 	if err != nil {
 		err = ctx.Status(fiber.StatusInternalServerError).SendString(err.Error())
@@ -40,7 +37,7 @@ func RenderTasks(ctx *fiber.Ctx, tasks []model.Task) {
 	}
 
 	data := struct {
-		Tasks []model.Task
+		Tasks []task.Task
 	}{
 		Tasks: tasks,
 	}
@@ -62,6 +59,9 @@ func RenderTasks(ctx *fiber.Ctx, tasks []model.Task) {
 
 func (h *TaskHandler) GetTasks(ctx *fiber.Ctx) error {
 	context_ := ctx.Context()
+
+	// TODO: 1
+
 	tasks, err := h.taskRepo.GetTasks(context_)
 	if err != nil {
 		err = ctx.Status(fiber.StatusInternalServerError).SendString(err.Error())
@@ -92,13 +92,15 @@ func (h *TaskHandler) EditTask(ctx *fiber.Ctx) error {
 	if err != nil {
 		errorMessage = "Error task type converting to integer"
 	}
-	editTask := &model.Task{
+	editTask := &task.Task{
 		TaskID:   taskUuid,
 		TypeID:   uint8(taskTypeInt),
 		Level:    level,
 		Question: question,
 		Answer:   answer,
 	}
+
+	// TODO: 2
 
 	err = h.taskRepo.UpdateTaskInfoByUUID(context_, editTask)
 	if err != nil {
@@ -114,6 +116,8 @@ func (h *TaskHandler) EditTask(ctx *fiber.Ctx) error {
 		B: incAnswerB,
 		C: incAnswerC,
 	}
+
+	// TODO: 3
 
 	err = h.incAnswersRepo.UpdateForTask(context_, taskUuid, incAnswers)
 	if err != nil {
@@ -136,14 +140,15 @@ func (h *TaskHandler) CreateTask(ctx *fiber.Ctx) error {
 
 	taskTypeInt, err := strconv.Atoi(taskType)
 
-	newTask := &model.Task{
+	newTask := &task.Task{
 		TaskID:   uuid.New(),
 		TypeID:   uint8(taskTypeInt),
 		Level:    level,
 		Question: question,
 		Answer:   answer,
 	}
-	internalId, err = h.taskRepo.NewTask(context_, newTask)
+
+	internalId, err = h.useCase.CreateTask(context_, newTask)
 	if err != nil {
 		return err
 	}
@@ -154,6 +159,8 @@ func (h *TaskHandler) CreateTask(ctx *fiber.Ctx) error {
 	incAnswerA := ctx.FormValue("incorrectA")
 	incAnswerB := ctx.FormValue("incorrectB")
 	incAnswerC := ctx.FormValue("incorrectC")
+
+	// TODO: 3
 
 	err = h.incAnswersRepo.AddForNewTask(context_, internalId, incAnswerA, incAnswerB, incAnswerC)
 	if err != nil {
@@ -174,16 +181,19 @@ func (h *TaskHandler) GetEditTaskForm(ctx *fiber.Ctx) error {
 	if err != nil {
 		return err
 	}
-	task, err := h.taskRepo.GetTaskByID(context_, uuid_)
+	task, err := h.useCase.GetTaskById(context_, uuid_)
 	if err != nil {
 		return err
 	}
 	if task == nil {
 		log.Panic("задачи для редактирования нет")
 	}
+
+	// TODO: 4
+
 	insAnswers, err := h.incAnswersRepo.GetAnswersForTask(context_, uuid_)
 	if err != nil {
-		log.Println("Error while getting incorrect answers")
+		log.Println("Error getting incorrect answers")
 		return err
 	}
 	data := fiber.Map{
@@ -200,6 +210,24 @@ func (h *TaskHandler) GetEditTaskForm(ctx *fiber.Ctx) error {
 	return ctx.Render("templates/edit_task.html", data)
 }
 
+func (h *TaskHandler) AddToModule(ctx *fiber.Ctx) error {
+	//context_ := ctx.Context()
+	//moduleID := ctx.Params("module_id")
+	//taskID := ctx.Params("task_id")
+	return nil
+}
+
 func (h *TaskHandler) BaseView(ctx *fiber.Ctx) error {
 	return ctx.Render("templates/base.html", fiber.Map{})
+}
+
+func (h *TaskHandler) GetTaskAccess(ctx *fiber.Ctx) error {
+	// отображение всех задач но добавить кнопки с галочкой
+	return nil
+}
+
+func (h *TaskHandler) EditTaskAccess(ctx *fiber.Ctx) error {
+	// нажать кнопку сохранить после проставления галочек из get
+	// редактирование происходит для определенного пользоватлея? модуля? разбить на модуль
+	return nil
 }

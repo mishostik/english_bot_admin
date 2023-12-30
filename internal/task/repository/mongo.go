@@ -2,7 +2,7 @@ package task
 
 import (
 	"context"
-	model "english_bot_admin/internal/task/models"
+	model "english_bot_admin/internal/task"
 	"errors"
 	"fmt"
 	"github.com/google/uuid"
@@ -17,12 +17,37 @@ type MongoTaskRepository struct {
 	typeCollection *mongo.Collection
 }
 
-func NewMongoTaskRepository(taskCollection *mongo.Collection, typeCollection *mongo.Collection) *MongoTaskRepository {
+func NewMongoTaskRepository(taskCollection *mongo.Collection, typeCollection *mongo.Collection) model.Repository {
 	return &MongoTaskRepository{
 		taskCollection: taskCollection,
 		typeCollection: typeCollection,
 	}
 }
+
+//func (mr *MongoTaskRepository) GetTasks() ([]model.Task, error) {
+//	//TODO implement me
+//	panic("implement me")
+//}
+
+//func (mr *MongoTaskRepository) GetTaskByID(taskID int) (*model.Task, error) {
+//	//TODO implement me
+//	panic("implement me")
+//}
+
+//func (mr *MongoTaskRepository) NewTask(task *model.Task) error {
+//	//TODO implement me
+//	panic("implement me")
+//}
+
+func (mr *MongoTaskRepository) UpdateTask(taskID int, task *model.Task) error {
+	//TODO implement me
+	panic("implement me")
+}
+
+//func (mr *MongoTaskRepository) DeleteTask(taskID int) error {
+//	//TODO implement me
+//	panic("implement me")
+//}
 
 func (mr *MongoTaskRepository) GetTasks(ctx context.Context) ([]model.Task, error) {
 	filter := bson.M{}
@@ -59,7 +84,7 @@ func (mr *MongoTaskRepository) GetTaskByID(ctx context.Context, taskID uuid.UUID
 	return &task, err
 }
 
-func (mr *MongoTaskRepository) NewTask(ctx context.Context, task *model.Task) (uuid.UUID, error) {
+func (mr *MongoTaskRepository) InsertTask(ctx context.Context, task *model.Task) (uuid.UUID, error) {
 	_, err := mr.taskCollection.InsertOne(ctx, task)
 	if err != nil {
 		return uuid.Nil, fmt.Errorf("error while adding task: %w", err)

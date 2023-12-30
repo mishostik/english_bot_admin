@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"english_bot_admin/internal/incorrect"
 	"english_bot_admin/internal/incorrect/models"
 	"errors"
 	"fmt"
@@ -15,7 +16,7 @@ type IncorrectRepository struct {
 	incAnswers *mongo.Collection
 }
 
-func NewIncorrectRepository(incAnswers *mongo.Collection) *IncorrectRepository {
+func NewIncorrectRepository(incAnswers *mongo.Collection) incorrect.Repository {
 	return &IncorrectRepository{
 		incAnswers: incAnswers,
 	}

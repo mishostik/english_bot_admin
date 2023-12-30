@@ -3,7 +3,6 @@ package httpserver
 import (
 	"context"
 	"english_bot_admin/database"
-	taskHttp "english_bot_admin/internal/task/http"
 	"log"
 	"os"
 
@@ -40,11 +39,10 @@ func (s *Server) Run() error {
 		log.Fatal(err)
 	}
 
-	taskCollection, err := db.Collection("tasks")
-	typeCollection, err := db.Collection("task_types")
-	incorrectAnswers, err := db.Collection("incorrect_answers")
-	handler := taskHttp.NewTaskHandler(taskCollection, typeCollection, incorrectAnswers)
-	taskHttp.TaskRoutes(s.app, handler)
+	err = MapHandlers(db, s)
+	if err != nil {
+		return err
+	}
 
 	err = s.app.Listen(":3000")
 	if err != nil {
