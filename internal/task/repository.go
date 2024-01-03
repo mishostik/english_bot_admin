@@ -14,4 +14,6 @@ type Repository interface {
 	UpdateTaskInfoByUUID(ctx context.Context, task *Task) error
 	//UpdateTask(taskID int, task *Task) error
 	//DeleteTask(taskID int) error
+
+	GetTasksByLvl(ctx context.Context, lvl string) ([]Task, error)
 }

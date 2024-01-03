@@ -46,3 +46,15 @@ func (r *ModuleRepository) SelectModules(ctx context.Context) ([]module.Module, 
 	}
 	return modules, nil
 }
+
+func (r *ModuleRepository) InsertTask(ctx context.Context, params module.TaskToModule) error {
+	filter := bson.M{"module_id": params.ModuleId}
+	update := bson.M{"$addToSet": bson.M{"task": params.TaskId}}
+
+	_, err := r.moduleCollection.UpdateOne(ctx, filter, update)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

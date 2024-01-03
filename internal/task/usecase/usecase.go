@@ -4,51 +4,79 @@ import (
 	"context"
 	"english_bot_admin/internal/module"
 	"english_bot_admin/internal/task"
+	"fmt"
 	"github.com/google/uuid"
 )
 
 type TaskUsecase struct {
 	moduleUC module.Usecase
-	taskRepo task.Repository
+	repo     task.Repository
 }
 
-func NewTaskUsecase(moduleUc module.Usecase, taskRepo task.Repository) task.Usecase {
+func NewTaskUsecase(moduleUc module.Usecase, repo task.Repository) task.Usecase {
 	return &TaskUsecase{
 		moduleUC: moduleUc,
-		taskRepo: taskRepo,
+		repo:     repo,
 	}
 }
 
-func (u *TaskUsecase) AddToModule(params *task.ToModule) error {
-	var (
-		module_ *module.Module
-		err     error
-	)
-	module_, err = u.moduleUC.GetModuleByID(params.ModuleID)
+func (u *TaskUsecase) GetTasks(context_ context.Context) ([]task.Task, error) {
+	tasks, err := u.repo.GetTasks(context_)
 	if err != nil {
-
+		return nil, err
 	}
-	if module_.Task == nil {
-		module_.Task = &[]uuid.UUID{}
-	}
-
-	*module_.Task = append(*module_.Task, params.TaskID)
-
-	return nil
+	return tasks, nil
 }
 
 func (u *TaskUsecase) GetTaskById(context_ context.Context, uuid_ uuid.UUID) (*task.Task, error) {
-	id, err := u.taskRepo.GetTaskByID(context_, uuid_)
+	id, err := u.repo.GetTaskByID(context_, uuid_)
 	if err != nil {
-		return nil, err
+		return &task.Task{}, err
 	}
 	return id, nil
 }
 
 func (u *TaskUsecase) CreateTask(ctx context.Context, task *task.Task) (uuid.UUID, error) {
-	uuid_, err := u.taskRepo.InsertTask(ctx, task)
+	uuid_, err := u.repo.InsertTask(ctx, task)
 	if err != nil {
 		return uuid.UUID{}, err
 	}
 	return uuid_, nil
+}
+
+func (u *TaskUsecase) GetTasksByLvl(ctx context.Context, params module.Lvl) ([]task.ByModule, error) {
+	var (
+		fullTasks []task.Task
+		tasks     []task.ByModule
+		err       error
+	)
+
+	fullTasks, err = u.repo.GetTasksByLvl(ctx, params.Level)
+	if err != nil {
+		fmt.Println("full tasks and err:", fullTasks, err)
+		return []task.ByModule{}, err
+	}
+
+	if len(fullTasks) == 0 {
+		return []task.ByModule{}, fmt.Errorf("task by level {%s} not found", params.Level)
+	}
+
+	for _, task_ := range fullTasks {
+		temp := &task.ByModule{
+			ModuleID: params.ModuleID,
+			TaskID:   task_.TaskID,
+			Question: task_.Question,
+			TypeID:   task_.TypeID,
+		}
+		tasks = append(tasks, *temp)
+	}
+	return tasks, nil
+}
+
+func (u *TaskUsecase) UpdateTaskInfoByUUID(ctx context.Context, task *task.Task) error {
+	err := u.repo.UpdateTaskInfoByUUID(ctx, task)
+	if err != nil {
+		return err
+	}
+	return nil
 }

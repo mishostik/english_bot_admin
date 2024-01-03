@@ -17,9 +17,6 @@ func NewModuleUsecase(moduleRepo repository.ModuleRepository) module.Usecase {
 }
 
 func (u *ModuleUseCase) GenerateModule(ctx context.Context, newModule module.NewModuleParams) error {
-	//uuid.New()
-	// module creating (repo method) with numbers of contain tasks
-	// to form module
 	temp := &module.Module{
 		ModuleID: uuid.New(),
 		Title:    newModule.Title,
@@ -51,4 +48,12 @@ func (u *ModuleUseCase) ChangeModule(newTasksNum []uuid.UUID) error {
 
 func (u *ModuleUseCase) GetModuleByID(moduleID uuid.UUID) (*module.Module, error) {
 	return nil, nil
+}
+
+func (u *ModuleUseCase) AddTask(ctx context.Context, params module.TaskToModule) error {
+	err := u.repo.InsertTask(ctx, params)
+	if err != nil {
+		return err
+	}
+	return nil
 }

@@ -135,6 +135,7 @@ h3 {
 }
 
 .task_setting {
+    width: 200px;
     margin-bottom: 20px;
 }
 
@@ -151,20 +152,24 @@ body {
 }
 
 .links {
+    display: flex;
+    flex-direction: column;
     background-color: #333333;
     padding: 10px;
     margin-bottom: 20px;
 }
-.links a:hover {
-    color: #462ff5;
+
+a:hover {
+    color: #6957f1;
     text-decoration: underline;
 }
-.links a {
+
+a {
     text-decoration: none;
 }
 
 
-.links a {
+a {
     color: #ffffff;
     text-decoration: none;
     margin-right: 10px;
@@ -212,4 +217,26 @@ p {
     display: flex;
     flex-direction: column;
     flex: 1 1 auto;
+}
+
+.adding_task {
+    width: 100%;
+    box-sizing: border-box;
+    border: 1px solid #ddd;
+    padding: 5px;
+    margin-bottom: 10px;
+    position: relative;
+}
+
+.task-container_inner {
+    width: 500px;
+    margin: 0 auto;
+    border: 1px solid #ccc;
+    padding: 10px;
+}
+
+button {
+    position: absolute;
+    bottom: 5px;
+    right: 5px;
 }

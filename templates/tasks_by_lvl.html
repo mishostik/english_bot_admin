@@ -12,18 +12,17 @@
   <a href="/task/all"> List of tasks </a>
 </div>
 <h2>Tasks</h2>
-<div class="task-container">
+
+<div class="task-container_inner">
   {{ range .Tasks }}
-    <div class="task">
-    <div class="span-wrap">
+  <form action="/module/task/add?task_id={{ .TaskID }}&module_id={{ .ModuleID }}" method="POST">
+    <div class="adding_task">
       <span><p>TypeID:</p> {{ .TypeID }} </span>
-      <span><p>Level:</p> {{ .Level }} </span>
       <span><p>Question:</p> {{ .Question }} </span>
-      <span><p>Answer:</p> {{ .Answer }} </span>
+      <button type="submit"> add </button>
     </div>
-<!--    <button class="refresh-button">Обновить</button>-->
-    <a href="/task/edit/{{.TaskID}}" class="edit-link"> edit </a>
-  </div>
+
+  </form>
   {{ end }}
 </div>
 </body>

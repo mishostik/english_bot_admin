@@ -2,18 +2,25 @@ package http
 
 import (
 	"bytes"
+	"english_bot_admin/internal/httpServer/cconstants"
 	"english_bot_admin/internal/module"
+	"english_bot_admin/internal/task"
+	"fmt"
 	"github.com/gofiber/fiber/v2"
+	"github.com/google/uuid"
 	"html/template"
+	"log"
 )
 
 type ModuleHandler struct {
-	UC module.Usecase
+	UC     module.Usecase
+	taskUC task.Usecase
 }
 
-func NewModuleHandler(useCase module.Usecase) *ModuleHandler {
+func NewModuleHandler(useCase module.Usecase, taskUC task.Usecase) *ModuleHandler {
 	return &ModuleHandler{
-		UC: useCase,
+		UC:     useCase,
+		taskUC: taskUC,
 	}
 }
 
@@ -68,30 +75,125 @@ func (h *ModuleHandler) CreateModule(ctx *fiber.Ctx) error {
 		context_ = ctx.Context()
 		err      error
 		params   module.NewModuleParams
+
+		errorMessage string = cconstants.SuccessModuleAdd
 	)
 
 	if err = ctx.BodyParser(&params); err != nil {
-		return err
+		errorMessage = fmt.Sprintf("error parsing params: %v", err.Error())
 	}
 
 	if params.Title == "" {
-		return fiber.NewError(fiber.StatusBadRequest, "Title is required")
+		return fiber.NewError(fiber.StatusBadRequest, cconstants.TitleRequired)
 	}
 	if params.Level == "" {
-		return fiber.NewError(fiber.StatusBadRequest, "Level is required")
-	}
-	if len(*params.Task) == 0 {
-		return fiber.NewError(fiber.StatusBadRequest, "Task is required")
+		return fiber.NewError(fiber.StatusBadRequest, cconstants.LevelRequired)
 	}
 
 	err = h.UC.GenerateModule(context_, params)
 	if err != nil {
-		return err
+		errorMessage = err.Error()
 	}
 
-	return nil
+	data := fiber.Map{
+		"Message": errorMessage,
+	}
+
+	return ctx.Render("templates/message.html", data)
 }
 
 func (h *ModuleHandler) GetNewModuleForm(ctx *fiber.Ctx) error {
 	return ctx.Render("templates/create_module.html", fiber.Map{})
+}
+
+func renderTasks(ctx *fiber.Ctx, tasks []task.ByModule) {
+	tmpl, err := template.ParseFiles("templates/tasks_by_lvl.html")
+	if err != nil {
+		err = ctx.Status(fiber.StatusInternalServerError).SendString(err.Error())
+		if err != nil {
+			return
+		}
+		return
+	}
+
+	data := struct {
+		Tasks []task.ByModule
+	}{
+		Tasks: tasks,
+	}
+
+	var buf bytes.Buffer
+	if err = tmpl.Execute(&buf, data); err != nil {
+		err = ctx.Status(fiber.StatusInternalServerError).SendString(err.Error())
+		if err != nil {
+			return
+		}
+		return
+	}
+	ctx.Set("Content-Type", "text/html")
+	err = ctx.Status(fiber.StatusOK).Send(buf.Bytes())
+	if err != nil {
+		return
+	}
+}
+
+func (h *ModuleHandler) GetTasksByLvl(ctx *fiber.Ctx) error {
+	var (
+		context_ = ctx.Context()
+		params   module.Lvl
+		err      error
+	)
+	params.Level = ctx.Query("level")
+	moduleIdStr := ctx.Query("module_id")
+	moduleID, err := uuid.Parse(moduleIdStr)
+	if err != nil {
+		return fmt.Errorf("error getting params (module id): %v", err)
+	}
+
+	params.ModuleID = moduleID
+
+	tasksByLvl, err := h.taskUC.GetTasksByLvl(context_, params)
+	if err != nil {
+		log.Println(err)
+		return err
+	}
+
+	renderTasks(ctx, tasksByLvl)
+
+	return nil
+}
+
+func (h *ModuleHandler) AddTasksByLvl(ctx *fiber.Ctx) error {
+	var (
+		params       module.TaskToModule
+		context_            = ctx.Context()
+		errorMessage string = "Task successfully added to module"
+	)
+
+	taskIDStr := ctx.Query("task_id")
+	taskID, err := uuid.Parse(taskIDStr)
+	if err != nil {
+		errorMessage = err.Error()
+	}
+
+	params.TaskId = taskID
+
+	moduleIdStr := ctx.Query("module_id")
+	moduleID, err := uuid.Parse(moduleIdStr)
+	if err != nil {
+		errorMessage = err.Error()
+	}
+
+	params.ModuleId = moduleID
+
+	err = h.UC.AddTask(context_, params)
+	if err != nil {
+		errorMessage = err.Error()
+	}
+
+	data := fiber.Map{
+		"Message": errorMessage,
+	}
+
+	return ctx.Render("templates/message.html", data)
 }

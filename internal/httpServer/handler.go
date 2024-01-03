@@ -9,24 +9,26 @@ import (
 	taskHttp "english_bot_admin/internal/task/http"
 	taskRepository "english_bot_admin/internal/task/repository"
 	taskUseCase "english_bot_admin/internal/task/usecase"
+
+	"english_bot_admin/internal/httpServer/cconstants"
 	"log"
 )
 
 func MapHandlers(db *database.Database, s *Server) error {
 
-	taskCollection, err := db.Collection(TasksCollection)
+	taskCollection, err := db.Collection(cconstants.TasksCollection)
 	if err != nil {
 		log.Fatalf("error connection {tasks}: %v", err.Error())
 	}
-	typeCollection, err := db.Collection(TypesCollection)
+	typeCollection, err := db.Collection(cconstants.TypesCollection)
 	if err != nil {
 		log.Fatalf("error connection {task types}: %v", err.Error())
 	}
-	incorrectAnswers, err := db.Collection(IncAnswersCollection)
+	incorrectAnswers, err := db.Collection(cconstants.IncAnswersCollection)
 	if err != nil {
 		log.Fatalf("error connection {incorrect answers}: %v", err.Error())
 	}
-	moduleCollection, err := db.Collection(ModulesCollection)
+	moduleCollection, err := db.Collection(cconstants.ModulesCollection)
 	if err != nil {
 		log.Fatalf("error connection {modules}: %v", err.Error())
 	}
@@ -46,7 +48,7 @@ func MapHandlers(db *database.Database, s *Server) error {
 
 	taskHttp.TaskRoutes(s.app, taskHandler)
 
-	moduleHandler := http.NewModuleHandler(moduleUC)
+	moduleHandler := http.NewModuleHandler(moduleUC, taskUC)
 	http.ModuleRoutes(s.app, moduleHandler)
 
 	return nil

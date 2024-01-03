@@ -1,14 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <link rel="stylesheet" type="text/css" href="/style-form.css">
+    <link rel="stylesheet" type="text/css" href="/styles.css">
     <meta charset="UTF-8">
     <title>Modules</title>
 </head>
 <body>
 <div class="links">
     <a href="/"> Main </a>
-    <a href="/module/create"> New module </a>
+    <a href="/module/new"> New module </a>
     <a href="/module/all"> List of modules </a>
 </div>
 <h2>Modules</h2>
@@ -17,21 +17,10 @@
     <div class="module">
         <div class="span-wrap">
             <span><p>Title:</p> {{ .Title }} </span>
-<!--            <span><p>TypeID:</p> {{ .TypeID }} </span>-->
-<!--            <span><p>Level:</p> {{ .Level }} </span>-->
-<!--            <span><p>Question:</p> {{ .Question }} </span>-->
-<!--            <span><p>Answer:</p> {{ .Answer }} </span>-->
         </div>
-        <!--    <button class="refresh-button">Обновить</button>-->
-<!--        <a href="/task/edit/{{.TaskID}}" class="edit-link"> edit </a>-->
+        <a href="/module/task/by_lvl?level={{ .Level }}&module_id={{.ModuleID}}"> add task </a>
     </div>
     {{ end }}
 </div>
 </body>
 </html>
-
-
-<!--ModuleID uuid.UUID   `json:"module_id" db:"module_id"`-->
-<!--Title    string      `json:"title" db:"title"`-->
-<!--Level    string      `json:"level" db:"level"`-->
-<!--Task     []uuid.UUID `json:"task" db:"task"`-->

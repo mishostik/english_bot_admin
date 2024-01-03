@@ -26,7 +26,7 @@ func NewTaskHandler(taskUseCase task.Usecase, taskRepo task.Repository, incRepo 
 	}
 }
 
-func RenderTasks(ctx *fiber.Ctx, tasks []task.Task) {
+func (h *TaskHandler) RenderTasks(ctx *fiber.Ctx, tasks []task.Task) {
 	tmpl, err := template.ParseFiles("templates/tasks.html")
 	if err != nil {
 		err = ctx.Status(fiber.StatusInternalServerError).SendString(err.Error())
@@ -59,10 +59,7 @@ func RenderTasks(ctx *fiber.Ctx, tasks []task.Task) {
 
 func (h *TaskHandler) GetTasks(ctx *fiber.Ctx) error {
 	context_ := ctx.Context()
-
-	// TODO: 1
-
-	tasks, err := h.taskRepo.GetTasks(context_)
+	tasks, err := h.useCase.GetTasks(context_)
 	if err != nil {
 		err = ctx.Status(fiber.StatusInternalServerError).SendString(err.Error())
 		if err != nil {
@@ -71,7 +68,7 @@ func (h *TaskHandler) GetTasks(ctx *fiber.Ctx) error {
 		return err
 	}
 
-	RenderTasks(ctx, tasks)
+	h.RenderTasks(ctx, tasks)
 	return nil
 }
 
@@ -99,10 +96,8 @@ func (h *TaskHandler) EditTask(ctx *fiber.Ctx) error {
 		Question: question,
 		Answer:   answer,
 	}
-
-	// TODO: 2
-
-	err = h.taskRepo.UpdateTaskInfoByUUID(context_, editTask)
+	
+	err = h.useCase.UpdateTaskInfoByUUID(context_, editTask)
 	if err != nil {
 		errorMessage = "Updating task info error"
 	}

@@ -10,4 +10,5 @@ type Usecase interface {
 	ChangeModule(newTasksNum []uuid.UUID) error
 	GetModules(ctx context.Context) ([]Module, error)
 	GetModuleByID(moduleID uuid.UUID) (*Module, error)
+	AddTask(ctx context.Context, params TaskToModule) error
 }
