@@ -25,3 +25,8 @@ type ByModule struct {
 	Question string    `bson:"question" json:"question"`
 	TypeID   uint8     `bson:"type_id" json:"type_id"`
 }
+
+type ByLvl struct {
+	Level    string    `json:"level"`
+	ModuleID uuid.UUID `json:"module_id" bson:"module_id"`
+}

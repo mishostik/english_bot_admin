@@ -21,7 +21,7 @@ func (u *ModuleUseCase) GenerateModule(ctx context.Context, newModule module.New
 		ModuleID: uuid.New(),
 		Title:    newModule.Title,
 		Level:    newModule.Level,
-		Task:     newModule.Task,
+		//Task:     newModule.Task,
 	}
 	err := u.repo.NewModule(ctx, temp)
 	if err != nil {

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <link rel="stylesheet" type="text/css" href="/styles.css">
+  <link rel="stylesheet" type="text/css" href="/dark-styles.css">
   <meta charset="UTF-8">
   <title>Tasks</title>
 </head>
@@ -14,16 +14,20 @@
 <h2>Tasks</h2>
 
 <div class="task-container_inner">
+
   {{ range .Tasks }}
   <form action="/module/task/add?task_id={{ .TaskID }}&module_id={{ .ModuleID }}" method="POST">
-    <div class="adding_task">
-      <span><p>TypeID:</p> {{ .TypeID }} </span>
-      <span><p>Question:</p> {{ .Question }} </span>
+
+    <div class="task">
+      <div><p>TypeID:</p> {{ .TypeID }} </div>
+      <div class="task-question"><p>Question:</p> {{ .Question }} </div>
       <button type="submit"> add </button>
     </div>
 
   </form>
   {{ end }}
+
 </div>
+
 </body>
 </html>

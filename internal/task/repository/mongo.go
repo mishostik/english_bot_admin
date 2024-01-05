@@ -24,30 +24,10 @@ func NewMongoTaskRepository(taskCollection *mongo.Collection, typeCollection *mo
 	}
 }
 
-//func (r *MongoTaskRepository) GetTasks() ([]model.Task, error) {
-//	//TODO implement me
-//	panic("implement me")
-//}
-
-//func (r *MongoTaskRepository) GetTaskByID(taskID int) (*model.Task, error) {
-//	//TODO implement me
-//	panic("implement me")
-//}
-
-//func (r *MongoTaskRepository) NewTask(task *model.Task) error {
-//	//TODO implement me
-//	panic("implement me")
-//}
-
 func (r *MongoTaskRepository) UpdateTask(taskID int, task *model.Task) error {
 	//TODO implement me
 	panic("implement me")
 }
-
-//func (r *MongoTaskRepository) DeleteTask(taskID int) error {
-//	//TODO implement me
-//	panic("implement me")
-//}
 
 func (r *MongoTaskRepository) GetTasks(ctx context.Context) ([]model.Task, error) {
 	filter := bson.M{}

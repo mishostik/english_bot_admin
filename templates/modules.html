@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <link rel="stylesheet" type="text/css" href="/styles.css">
+    <link rel="stylesheet" type="text/css" href="/dark-styles.css">
     <meta charset="UTF-8">
     <title>Modules</title>
 </head>
@@ -9,18 +9,87 @@
 <div class="links">
     <a href="/"> Main </a>
     <a href="/module/new"> New module </a>
-    <a href="/module/all"> List of modules </a>
 </div>
 <h2>Modules</h2>
 <div class="module-container">
+
     {{ range .Modules }}
     <div class="module">
-        <div class="span-wrap">
-            <span><p>Title:</p> {{ .Title }} </span>
-        </div>
-        <a href="/module/task/by_lvl?level={{ .Level }}&module_id={{.ModuleID}}"> add task </a>
+<!--        <form action="/module/task/by_lvl?level={{ .Level }}&module_id={{.ModuleID}}" method="POST">-->
+<!--&lt;!&ndash;            <div class="module">&ndash;&gt;-->
+<!--                <div class="span-wrap">-->
+<!--                    <span>Title:</p> {{ .Title }} </span>-->
+<!--                    <span> {{ .Level }} </span>-->
+<!--                    {{ range .Task }}-->
+
+<!--&lt;!&ndash;                    <h4>Tasks</h4>&ndash;&gt;-->
+<!--                    <div class="task">-->
+<!--                        <span><p>Id:</p> {{ .TaskID }} </span>-->
+<!--                        <span><p>Question:</p> {{ .Question }} </span>-->
+<!--                    </div>-->
+<!--                    {{end}}-->
+<!--                    <button type="submit"> add task </button>-->
+<!--                </div>-->
+<!--&lt;!&ndash;            </div>&ndash;&gt;-->
+
+<!--        </form>-->
+
+
+
+
+
+
+
+            <form action="/module/task/by_lvl?level={{ .Level }}&module_id={{.ModuleID}}" method="POST">
+                <div class="module-wrap">
+
+                    <div class="module-info-wrap">
+                        <div class="module-info"> N </div>
+                        <div class="module-info">{{ .Level }}</div>
+                        <div class="module-info">{{ .Title }}</div>
+                    </div>
+
+                    {{ range .Task }}
+
+                    <div class="module-task">
+                        <div class="module-task-info module-task-question"> {{ .Question }} </div>
+<!--                        <div class="module-task-info"><span title="{{ .TaskID }}">[Id]</span> </div>-->
+                        <div class="module-task-info">{{.TaskID}}</div>
+                    </div>
+
+                    {{ end }}
+
+                    <button class="module-task-add" type="submit"> add task </button>
+                </div>
+            </form>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     </div>
     {{ end }}
+
 </div>
 </body>
 </html>

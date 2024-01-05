@@ -1,20 +1,21 @@
 package module
 
 import (
+	"english_bot_admin/internal/task"
 	"github.com/google/uuid"
 )
 
 type Module struct {
-	ModuleID uuid.UUID    `json:"module_id" bson:"module_id"`
-	Title    string       `json:"title" bson:"title"`
-	Level    string       `json:"level" bson:"level"`
-	Task     *[]uuid.UUID `json:"task" bson:"task,omitempty"`
+	ModuleID uuid.UUID   `json:"module_id" bson:"module_id"`
+	Title    string      `json:"title" bson:"title"`
+	Level    string      `json:"level" bson:"level"`
+	Task     []task.Task `json:"task" bson:"task,omitempty"`
 }
 
 type NewModuleParams struct {
-	Title string       `json:"title"`
-	Level string       `json:"level" bson:"level"`
-	Task  *[]uuid.UUID `json:"task" bson:"task,omitempty"`
+	Title string `json:"title"`
+	Level string `json:"level" bson:"level"`
+	//Task  *[]uuid.UUID `json:"task" bson:"task,omitempty"`
 }
 
 type Lvl struct {
@@ -24,5 +25,6 @@ type Lvl struct {
 
 type TaskToModule struct {
 	ModuleId uuid.UUID `json:"module_id" bson:"module_id"`
-	TaskId   uuid.UUID `json:"task_id" bson:"task_id"`
+	//TaskId   uuid.UUID `json:"task_id" bson:"task_id"`
+	Task *task.Task `json:"task" bson:"task"`
 }

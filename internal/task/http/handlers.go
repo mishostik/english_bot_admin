@@ -96,7 +96,7 @@ func (h *TaskHandler) EditTask(ctx *fiber.Ctx) error {
 		Question: question,
 		Answer:   answer,
 	}
-	
+
 	err = h.useCase.UpdateTaskInfoByUUID(context_, editTask)
 	if err != nil {
 		errorMessage = "Updating task info error"
@@ -176,11 +176,11 @@ func (h *TaskHandler) GetEditTaskForm(ctx *fiber.Ctx) error {
 	if err != nil {
 		return err
 	}
-	task, err := h.useCase.GetTaskById(context_, uuid_)
+	task_, err := h.useCase.GetTaskById(context_, uuid_)
 	if err != nil {
 		return err
 	}
-	if task == nil {
+	if task_ == nil {
 		log.Panic("задачи для редактирования нет")
 	}
 
@@ -193,11 +193,11 @@ func (h *TaskHandler) GetEditTaskForm(ctx *fiber.Ctx) error {
 	}
 	data := fiber.Map{
 		"TaskID":     uuid_,
-		"Task":       task,
-		"TypeID":     task.TypeID,
-		"Level":      task.Level,
-		"Question":   task.Question,
-		"Answer":     task.Answer,
+		"Task":       task_,
+		"TypeID":     task_.TypeID,
+		"Level":      task_.Level,
+		"Question":   task_.Question,
+		"Answer":     task_.Answer,
 		"IncorrectA": insAnswers.A,
 		"IncorrectB": insAnswers.B,
 		"IncorrectC": insAnswers.C,

@@ -140,7 +140,7 @@ func renderTasks(ctx *fiber.Ctx, tasks []task.ByModule) {
 func (h *ModuleHandler) GetTasksByLvl(ctx *fiber.Ctx) error {
 	var (
 		context_ = ctx.Context()
-		params   module.Lvl
+		params   = &task.ByLvl{}
 		err      error
 	)
 	params.Level = ctx.Query("level")
@@ -173,22 +173,59 @@ func (h *ModuleHandler) AddTasksByLvl(ctx *fiber.Ctx) error {
 	taskIDStr := ctx.Query("task_id")
 	taskID, err := uuid.Parse(taskIDStr)
 	if err != nil {
-		errorMessage = err.Error()
+		//errorMessage = err.Error()
+		err = ctx.Status(fiber.StatusInternalServerError).SendString(err.Error())
+		if err != nil {
+			return err
+		}
 	}
 
-	params.TaskId = taskID
+	// todo: generate task
+	// 1 - find by id
+	receivedTask, err := h.taskUC.GetTaskById(context_, taskID)
+	if err != nil {
+		err = ctx.Status(fiber.StatusInternalServerError).SendString(err.Error())
+		if err != nil {
+			return err
+		}
+	}
+
+	if receivedTask == nil {
+		return ctx.Status(fiber.StatusInternalServerError).SendString(fmt.Sprintf("Task by uuid is not received"))
+		//if err != nil {
+		//	return err
+		//}
+	}
+
+	// 2 - get the struct
+	temp := &task.Task{
+		TaskID:   taskID,
+		TypeID:   receivedTask.TypeID,
+		Level:    receivedTask.Level,
+		Question: receivedTask.Question,
+		Answer:   receivedTask.Answer,
+	}
+
+	// 3 - params.Task = temp struct
+	params.Task = temp
 
 	moduleIdStr := ctx.Query("module_id")
 	moduleID, err := uuid.Parse(moduleIdStr)
 	if err != nil {
-		errorMessage = err.Error()
+		err = ctx.Status(fiber.StatusInternalServerError).SendString(err.Error())
+		if err != nil {
+			return err
+		}
 	}
 
 	params.ModuleId = moduleID
 
 	err = h.UC.AddTask(context_, params)
 	if err != nil {
-		errorMessage = err.Error()
+		err = ctx.Status(fiber.StatusInternalServerError).SendString(err.Error())
+		if err != nil {
+			return err
+		}
 	}
 
 	data := fiber.Map{

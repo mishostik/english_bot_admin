@@ -10,6 +10,10 @@ func ModuleRoutes(app *fiber.App, h *ModuleHandler) {
 
 	taskInnerGroup := moduleGroup.Group("/task")
 
-	taskInnerGroup.Get("/by_lvl", h.GetTasksByLvl)
+	//taskInnerGroup.Get("/by_lvl", h.GetTasksByLvl)
+
+	taskInnerGroup.Post("/by_lvl", h.GetTasksByLvl)
+
+	// some questions ???
 	taskInnerGroup.Post("/add", h.AddTasksByLvl)
 }

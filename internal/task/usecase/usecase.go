@@ -2,21 +2,18 @@ package usecase
 
 import (
 	"context"
-	"english_bot_admin/internal/module"
 	"english_bot_admin/internal/task"
 	"fmt"
 	"github.com/google/uuid"
 )
 
 type TaskUsecase struct {
-	moduleUC module.Usecase
-	repo     task.Repository
+	repo task.Repository
 }
 
-func NewTaskUsecase(moduleUc module.Usecase, repo task.Repository) task.Usecase {
+func NewTaskUsecase(repo task.Repository) task.Usecase {
 	return &TaskUsecase{
-		moduleUC: moduleUc,
-		repo:     repo,
+		repo: repo,
 	}
 }
 
@@ -29,11 +26,11 @@ func (u *TaskUsecase) GetTasks(context_ context.Context) ([]task.Task, error) {
 }
 
 func (u *TaskUsecase) GetTaskById(context_ context.Context, uuid_ uuid.UUID) (*task.Task, error) {
-	id, err := u.repo.GetTaskByID(context_, uuid_)
+	task_, err := u.repo.GetTaskByID(context_, uuid_)
 	if err != nil {
-		return &task.Task{}, err
+		return nil, err
 	}
-	return id, nil
+	return task_, nil
 }
 
 func (u *TaskUsecase) CreateTask(ctx context.Context, task *task.Task) (uuid.UUID, error) {
@@ -44,7 +41,7 @@ func (u *TaskUsecase) CreateTask(ctx context.Context, task *task.Task) (uuid.UUI
 	return uuid_, nil
 }
 
-func (u *TaskUsecase) GetTasksByLvl(ctx context.Context, params module.Lvl) ([]task.ByModule, error) {
+func (u *TaskUsecase) GetTasksByLvl(ctx context.Context, params *task.ByLvl) ([]task.ByModule, error) {
 	var (
 		fullTasks []task.Task
 		tasks     []task.ByModule
