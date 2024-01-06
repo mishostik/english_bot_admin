@@ -6,6 +6,7 @@ const (
 	IncAnswersCollection = "incorrect_answers"
 	TypesCollection      = "task_types"
 	UsersCollection      = "users"
+	RulesCollection      = "rules"
 )
 
 const (

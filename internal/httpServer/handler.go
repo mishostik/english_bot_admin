@@ -2,7 +2,11 @@ package httpserver
 
 import (
 	"english_bot_admin/database"
+	"english_bot_admin/internal/httpServer/cconstants"
 	incAnswersRepository "english_bot_admin/internal/incorrect/repository"
+	ruleHttp "english_bot_admin/internal/learning/http"
+	ruleRepository "english_bot_admin/internal/learning/repository"
+	ruleUseCase "english_bot_admin/internal/learning/usecase"
 	"english_bot_admin/internal/module/http"
 	moduleRepository "english_bot_admin/internal/module/repository"
 	moduleUseCase "english_bot_admin/internal/module/usecase"
@@ -12,8 +16,6 @@ import (
 	userHttp "english_bot_admin/internal/user/http"
 	userRepository "english_bot_admin/internal/user/repository"
 	userUseCase "english_bot_admin/internal/user/usecase"
-
-	"english_bot_admin/internal/httpServer/cconstants"
 	"log"
 )
 
@@ -37,6 +39,14 @@ func MapHandlers(db *database.Database, s *Server) error {
 	}
 
 	userCollection, err := db.Collection(cconstants.UsersCollection)
+	if err != nil {
+		log.Fatalf("error connection {users}: %v", err.Error())
+	}
+
+	ruleCollection, err := db.Collection(cconstants.RulesCollection)
+	if err != nil {
+		log.Fatalf("error connection {rules}: %v", err.Error())
+	}
 
 	// ------------------------ repositories ------------------------
 
@@ -44,11 +54,16 @@ func MapHandlers(db *database.Database, s *Server) error {
 	taskRepo := taskRepository.NewMongoTaskRepository(taskCollection, typeCollection)
 	incAnswersRepo := incAnswersRepository.NewIncorrectRepository(incorrectAnswers)
 	userRepo := userRepository.NewUserRepository(userCollection)
+	ruleRepo := ruleRepository.NewLearnRepository(ruleCollection)
 
-	// ------------------------- use cases -------------------------
+	// -------------------------- use cases --------------------------
 
 	moduleUC := moduleUseCase.NewModuleUsecase(*moduleRepo)
 	taskUC := taskUseCase.NewTaskUsecase(taskRepo)
+	userUC := userUseCase.NewUserUsecase(userRepo)
+	ruleUC := ruleUseCase.NewLearnUsecase(ruleRepo)
+
+	// --------------------------- handlers ---------------------------
 
 	taskHandler := taskHttp.NewTaskHandler(taskUC, taskRepo, incAnswersRepo)
 	taskHttp.TaskRoutes(s.app, taskHandler)
@@ -56,10 +71,11 @@ func MapHandlers(db *database.Database, s *Server) error {
 	moduleHandler := http.NewModuleHandler(moduleUC, taskUC)
 	http.ModuleRoutes(s.app, moduleHandler)
 
-	userUsecase := userUseCase.NewUserUsecase(userRepo)
-	userHandler := userHttp.NewUserHandler(userUsecase)
+	userHandler := userHttp.NewUserHandler(userUC)
 	userHttp.UserRoutes(s.app, userHandler)
 
-	return nil
+	ruleHandler := ruleHttp.NewLearnHandler(ruleUC)
+	ruleHttp.LearnRoutes(s.app, ruleHandler)
 
+	return nil
 }

@@ -24,11 +24,6 @@ func NewMongoTaskRepository(taskCollection *mongo.Collection, typeCollection *mo
 	}
 }
 
-func (r *MongoTaskRepository) UpdateTask(taskID int, task *model.Task) error {
-	//TODO implement me
-	panic("implement me")
-}
-
 func (r *MongoTaskRepository) GetTasks(ctx context.Context) ([]model.Task, error) {
 	filter := bson.M{}
 	var tasks []model.Task
