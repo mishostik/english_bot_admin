@@ -15,30 +15,6 @@
 
     {{ range .Modules }}
     <div class="module">
-<!--        <form action="/module/task/by_lvl?level={{ .Level }}&module_id={{.ModuleID}}" method="POST">-->
-<!--&lt;!&ndash;            <div class="module">&ndash;&gt;-->
-<!--                <div class="span-wrap">-->
-<!--                    <span>Title:</p> {{ .Title }} </span>-->
-<!--                    <span> {{ .Level }} </span>-->
-<!--                    {{ range .Task }}-->
-
-<!--&lt;!&ndash;                    <h4>Tasks</h4>&ndash;&gt;-->
-<!--                    <div class="task">-->
-<!--                        <span><p>Id:</p> {{ .TaskID }} </span>-->
-<!--                        <span><p>Question:</p> {{ .Question }} </span>-->
-<!--                    </div>-->
-<!--                    {{end}}-->
-<!--                    <button type="submit"> add task </button>-->
-<!--                </div>-->
-<!--&lt;!&ndash;            </div>&ndash;&gt;-->
-
-<!--        </form>-->
-
-
-
-
-
-
 
             <form action="/module/task/by_lvl?level={{ .Level }}&module_id={{.ModuleID}}" method="POST">
                 <div class="module-wrap">
@@ -62,30 +38,6 @@
                     <button class="module-task-add" type="submit"> add task </button>
                 </div>
             </form>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     </div>
     {{ end }}

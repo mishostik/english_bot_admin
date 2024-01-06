@@ -75,3 +75,7 @@ func (h *LearnHandler) AllRules(ctx *fiber.Ctx) error {
 	h.renderRules(ctx, rules)
 	return nil
 }
+
+func (h *LearnHandler) GetNewRuleForm(ctx *fiber.Ctx) error {
+	return ctx.Render("templates/create_rule.html", fiber.Map{})
+}
