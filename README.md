@@ -1,1 +1,1 @@
-# english_bot_bot
+# english_bot_admin
