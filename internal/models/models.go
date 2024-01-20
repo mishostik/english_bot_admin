@@ -83,3 +83,10 @@ type AdminSignInParams struct {
 	Login    string `json:"login" bson:"login"`
 	Password string `json:"password" bson:"password"`
 }
+
+type Admin struct {
+	AdminId      uuid.UUID `bson:"admin_id"`
+	Login        string    `bson:"login"`
+	Password     string    `bson:"password"`
+	RegisteredAt time.Time `bson:"registered_at"`
+}

@@ -43,6 +43,11 @@ func MapHandlers(db *database.Database, s *Server) error {
 		log.Fatalf("error connection {users}: %v", err.Error())
 	}
 
+	adminCollection, err := db.Collection(cconstants.AdminCollection)
+	if err != nil {
+		log.Fatalf("error connection {admins}: %v", err.Error())
+	}
+
 	ruleCollection, err := db.Collection(cconstants.RulesCollection)
 	if err != nil {
 		log.Fatalf("error connection {rules}: %v", err.Error())
@@ -53,7 +58,7 @@ func MapHandlers(db *database.Database, s *Server) error {
 	moduleRepo := moduleRepository.NewModuleRepository(moduleCollection)
 	taskRepo := taskRepository.NewMongoTaskRepository(taskCollection, typeCollection)
 	incAnswersRepo := incAnswersRepository.NewIncorrectRepository(incorrectAnswers)
-	userRepo := userRepository.NewUserRepository(userCollection)
+	userRepo := userRepository.NewUserRepository(userCollection, adminCollection)
 	ruleRepo := ruleRepository.NewLearnRepository(ruleCollection)
 
 	// -------------------------- use cases --------------------------

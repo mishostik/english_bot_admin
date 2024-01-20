@@ -63,7 +63,48 @@ func (h *UserHandler) GetAll(ctx *fiber.Ctx) error {
 }
 
 func (h *UserHandler) AdminSignIn(ctx *fiber.Ctx) error {
-	//context_ := ctx.Context()
+	var (
+		params   models.AdminSignInParams
+		context_ = ctx.Context()
+		response = map[string]interface{}{"success": false, "error": ""}
+		isExist  bool
 
-	return nil
+		err error
+	)
+
+	if err = ctx.BodyParser(&params); err != nil {
+		return ctx.SendStatus(fiber.StatusBadRequest)
+	}
+
+	isExist, err = h.uc.AdminSignIn(context_, &params)
+	if err != nil {
+		response["success"] = false
+		response["error"] = err.Error()
+		return ctx.Status(fiber.StatusInternalServerError).JSON(response)
+	}
+
+	response["success"] = isExist
+	return ctx.Status(fiber.StatusOK).JSON(response)
+}
+
+func (h *UserHandler) AdminSignUp(ctx *fiber.Ctx) error {
+	var (
+		params   models.AdminSignInParams
+		context_ = ctx.Context()
+		response = map[string]interface{}{"success": false, "error": ""}
+
+		err error
+	)
+
+	if err = ctx.BodyParser(&params); err != nil {
+		return ctx.SendStatus(fiber.StatusBadRequest)
+	}
+
+	err = h.uc.AdminSignUp(context_, &params)
+	if err != nil {
+		response["error"] = err.Error()
+		return ctx.Status(fiber.StatusInternalServerError).JSON(response)
+	}
+
+	return ctx.SendStatus(fiber.StatusOK)
 }

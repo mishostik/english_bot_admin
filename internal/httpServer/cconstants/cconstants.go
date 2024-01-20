@@ -7,6 +7,7 @@ const (
 	TypesCollection      = "task_types"
 	UsersCollection      = "users"
 	RulesCollection      = "rules"
+	AdminCollection      = "admins"
 )
 
 const (

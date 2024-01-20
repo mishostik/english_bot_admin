@@ -7,7 +7,6 @@ import (
 	"os"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/joho/godotenv"
 )
 
 type Server struct {
@@ -25,10 +24,10 @@ func (s *Server) Run() error {
 	)
 	s.app.Static("/", "./templates/styles")
 
-	err = godotenv.Load(".env")
-	if err != nil {
-		log.Fatal("Error loading .env file")
-	}
+	//err = godotenv.Load(".env")
+	//if err != nil {
+	//	log.Fatal("Error loading .env file")
+	//}
 
 	dbURI := os.Getenv("DB_URI")
 	dbName := os.Getenv("DB_NAME")
