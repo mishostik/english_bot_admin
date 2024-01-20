@@ -2,22 +2,23 @@ package http
 
 import (
 	"bytes"
+	"english_bot_admin/internal/models"
 	"english_bot_admin/internal/user"
 	"github.com/gofiber/fiber/v2"
 	"html/template"
 )
 
 type UserHandler struct {
-	UC user.Usecase
+	uc user.Usecase
 }
 
 func NewUserHandler(ucase user.Usecase) *UserHandler {
 	return &UserHandler{
-		UC: ucase,
+		uc: ucase,
 	}
 }
 
-func renderUsers(ctx *fiber.Ctx, users []user.User) {
+func renderUsers(ctx *fiber.Ctx, users []models.User) {
 	tmpl, err := template.ParseFiles("templates/users.html")
 	if err != nil {
 		err = ctx.Status(fiber.StatusInternalServerError).SendString(err.Error())
@@ -28,7 +29,7 @@ func renderUsers(ctx *fiber.Ctx, users []user.User) {
 	}
 
 	data := struct {
-		Users  []user.User
+		Users  []models.User
 		Amount int
 	}{
 		Users:  users,
@@ -52,11 +53,17 @@ func renderUsers(ctx *fiber.Ctx, users []user.User) {
 
 func (h *UserHandler) GetAll(ctx *fiber.Ctx) error {
 	context_ := ctx.Context()
-	users, err := h.UC.GetAll(context_)
+	users, err := h.uc.GetAll(context_)
 	if err != nil {
 		return err
 	}
 
 	renderUsers(ctx, users)
+	return nil
+}
+
+func (h *UserHandler) AdminSignIn(ctx *fiber.Ctx) error {
+	//context_ := ctx.Context()
+
 	return nil
 }

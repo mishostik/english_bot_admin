@@ -2,7 +2,7 @@ package repository
 
 import (
 	"context"
-	"english_bot_admin/internal/module"
+	"english_bot_admin/internal/models"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"log"
@@ -18,7 +18,7 @@ func NewModuleRepository(moduleCollection *mongo.Collection) *ModuleRepository {
 	}
 }
 
-func (r *ModuleRepository) NewModule(ctx context.Context, module *module.Module) error {
+func (r *ModuleRepository) NewModule(ctx context.Context, module *models.Module) error {
 	_, err := r.moduleCollection.InsertOne(ctx, module)
 	if err != nil {
 		return err
@@ -26,13 +26,13 @@ func (r *ModuleRepository) NewModule(ctx context.Context, module *module.Module)
 	return nil
 }
 
-func (r *ModuleRepository) SelectModules(ctx context.Context) ([]module.Module, error) {
+func (r *ModuleRepository) SelectModules(ctx context.Context) ([]models.Module, error) {
 	filter := bson.M{}
-	var modules []module.Module
+	var modules []models.Module
 	cursor, err := r.moduleCollection.Find(ctx, filter)
 	if err != nil {
 		log.Println("error while getting modules:", err)
-		return []module.Module{}, err
+		return []models.Module{}, err
 	}
 	defer func(cursor *mongo.Cursor, ctx context.Context) {
 		err = cursor.Close(ctx)
@@ -42,12 +42,12 @@ func (r *ModuleRepository) SelectModules(ctx context.Context) ([]module.Module, 
 	}(cursor, ctx)
 	if err = cursor.All(ctx, &modules); err != nil {
 		log.Println("error while decoding modules:", err)
-		return []module.Module{}, err
+		return []models.Module{}, err
 	}
 	return modules, nil
 }
 
-func (r *ModuleRepository) InsertTask(ctx context.Context, params module.TaskToModule) error {
+func (r *ModuleRepository) InsertTask(ctx context.Context, params *models.TaskToModule) error {
 	filter := bson.M{"module_id": params.ModuleId}
 	update := bson.M{"$addToSet": bson.M{"task": params.Task}}
 

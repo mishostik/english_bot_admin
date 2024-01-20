@@ -3,7 +3,7 @@ package repository
 import (
 	"context"
 	"english_bot_admin/internal/incorrect"
-	"english_bot_admin/internal/incorrect/models"
+	"english_bot_admin/internal/models"
 	"errors"
 	"fmt"
 	"github.com/google/uuid"

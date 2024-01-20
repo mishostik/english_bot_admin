@@ -2,6 +2,7 @@ package task
 
 import (
 	"context"
+	"english_bot_admin/internal/models"
 	model "english_bot_admin/internal/task"
 	"errors"
 	"fmt"
@@ -24,9 +25,9 @@ func NewMongoTaskRepository(taskCollection *mongo.Collection, typeCollection *mo
 	}
 }
 
-func (r *MongoTaskRepository) GetTasks(ctx context.Context) ([]model.Task, error) {
+func (r *MongoTaskRepository) GetTasks(ctx context.Context) ([]models.Task, error) {
 	filter := bson.M{}
-	var tasks []model.Task
+	var tasks []models.Task
 	cursor, err := r.taskCollection.Find(ctx, filter)
 	if err != nil {
 		log.Println("error while getting tasks:", err)
@@ -45,9 +46,9 @@ func (r *MongoTaskRepository) GetTasks(ctx context.Context) ([]model.Task, error
 	return tasks, nil
 }
 
-func (r *MongoTaskRepository) GetTaskByID(ctx context.Context, taskID uuid.UUID) (*model.Task, error) {
+func (r *MongoTaskRepository) GetTaskByID(ctx context.Context, taskID uuid.UUID) (*models.Task, error) {
 	filter := bson.M{"task_id": taskID}
-	var task model.Task
+	var task models.Task
 	err := r.taskCollection.FindOne(ctx, filter).Decode(&task)
 	if err != nil {
 		if errors.Is(err, mongo.ErrNoDocuments) {
@@ -59,7 +60,7 @@ func (r *MongoTaskRepository) GetTaskByID(ctx context.Context, taskID uuid.UUID)
 	return &task, err
 }
 
-func (r *MongoTaskRepository) InsertTask(ctx context.Context, task *model.Task) (uuid.UUID, error) {
+func (r *MongoTaskRepository) InsertTask(ctx context.Context, task *models.Task) (uuid.UUID, error) {
 	_, err := r.taskCollection.InsertOne(ctx, task)
 	if err != nil {
 		return uuid.Nil, fmt.Errorf("error while adding task: %w", err)
@@ -68,7 +69,7 @@ func (r *MongoTaskRepository) InsertTask(ctx context.Context, task *model.Task) 
 	return task.TaskID, nil
 }
 
-func (r *MongoTaskRepository) UpdateTaskInfoByUUID(ctx context.Context, task *model.Task) error {
+func (r *MongoTaskRepository) UpdateTaskInfoByUUID(ctx context.Context, task *models.Task) error {
 	filter := bson.M{"task_id": task.TaskID}
 	update := bson.M{
 		"$set": bson.M{
@@ -87,7 +88,7 @@ func (r *MongoTaskRepository) UpdateTaskInfoByUUID(ctx context.Context, task *mo
 	return nil
 }
 
-func (r *MongoTaskRepository) UpdateTaskUUID(ctx context.Context, task *model.Task) error {
+func (r *MongoTaskRepository) UpdateTaskUUID(ctx context.Context, task *models.Task) error {
 	filter := bson.M{"question": task.Question}
 	update := bson.M{
 		"$set": bson.M{
@@ -116,9 +117,9 @@ func (r *MongoTaskRepository) DeleteTask(ctx context.Context, taskID int) error 
 	return nil
 }
 
-func (r *MongoTaskRepository) GetTasksWithoutUUID(ctx context.Context) ([]model.Task, error) {
+func (r *MongoTaskRepository) GetTasksWithoutUUID(ctx context.Context) ([]models.Task, error) {
 	filter := bson.M{"task_id": nil}
-	var tasks []model.Task
+	var tasks []models.Task
 
 	cursor, err := r.taskCollection.Find(ctx, filter)
 	if err != nil {
@@ -136,10 +137,10 @@ func (r *MongoTaskRepository) GetTasksWithoutUUID(ctx context.Context) ([]model.
 	return tasks, nil
 }
 
-func (r *MongoTaskRepository) GetTasksByLvl(ctx context.Context, lvl string) ([]model.Task, error) {
+func (r *MongoTaskRepository) GetTasksByLvl(ctx context.Context, lvl string) ([]models.Task, error) {
 	log.Println("level is:", lvl)
 	filter := bson.M{"level": lvl}
-	var tasks []model.Task
+	var tasks []models.Task
 
 	cursor, err := r.taskCollection.Find(ctx, filter)
 	if err != nil {

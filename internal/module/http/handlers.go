@@ -3,6 +3,7 @@ package http
 import (
 	"bytes"
 	"english_bot_admin/internal/httpServer/cconstants"
+	"english_bot_admin/internal/models"
 	"english_bot_admin/internal/module"
 	"english_bot_admin/internal/task"
 	"fmt"
@@ -24,7 +25,7 @@ func NewModuleHandler(useCase module.Usecase, taskUC task.Usecase) *ModuleHandle
 	}
 }
 
-func renderModules(ctx *fiber.Ctx, modules []module.Module) {
+func renderModules(ctx *fiber.Ctx, modules []models.Module) {
 	tmpl, err := template.ParseFiles("templates/modules.html")
 	if err != nil {
 		err = ctx.Status(fiber.StatusInternalServerError).SendString(err.Error())
@@ -35,7 +36,7 @@ func renderModules(ctx *fiber.Ctx, modules []module.Module) {
 	}
 
 	data := struct {
-		Modules []module.Module
+		Modules []models.Module
 	}{
 		Modules: modules,
 	}
@@ -74,7 +75,7 @@ func (h *ModuleHandler) CreateModule(ctx *fiber.Ctx) error {
 	var (
 		context_ = ctx.Context()
 		err      error
-		params   module.NewModuleParams
+		params   models.NewModuleParams
 
 		errorMessage string = cconstants.SuccessModuleAdd
 	)
@@ -90,7 +91,7 @@ func (h *ModuleHandler) CreateModule(ctx *fiber.Ctx) error {
 		return fiber.NewError(fiber.StatusBadRequest, cconstants.LevelRequired)
 	}
 
-	err = h.UC.GenerateModule(context_, params)
+	err = h.UC.GenerateModule(context_, &params)
 	if err != nil {
 		errorMessage = err.Error()
 	}
@@ -106,7 +107,7 @@ func (h *ModuleHandler) GetNewModuleForm(ctx *fiber.Ctx) error {
 	return ctx.Render("templates/create_module.html", fiber.Map{})
 }
 
-func renderTasks(ctx *fiber.Ctx, tasks []task.ByModule) {
+func renderTasks(ctx *fiber.Ctx, tasks []models.ByModule) {
 	tmpl, err := template.ParseFiles("templates/tasks_by_lvl.html")
 	if err != nil {
 		err = ctx.Status(fiber.StatusInternalServerError).SendString(err.Error())
@@ -117,7 +118,7 @@ func renderTasks(ctx *fiber.Ctx, tasks []task.ByModule) {
 	}
 
 	data := struct {
-		Tasks []task.ByModule
+		Tasks []models.ByModule
 	}{
 		Tasks: tasks,
 	}
@@ -140,7 +141,7 @@ func renderTasks(ctx *fiber.Ctx, tasks []task.ByModule) {
 func (h *ModuleHandler) GetTasksByLvl(ctx *fiber.Ctx) error {
 	var (
 		context_ = ctx.Context()
-		params   = &task.ByLvl{}
+		params   = &models.ByLvl{}
 		err      error
 	)
 	params.Level = ctx.Query("level")
@@ -165,7 +166,7 @@ func (h *ModuleHandler) GetTasksByLvl(ctx *fiber.Ctx) error {
 
 func (h *ModuleHandler) AddTasksByLvl(ctx *fiber.Ctx) error {
 	var (
-		params       module.TaskToModule
+		params       models.TaskToModule
 		context_            = ctx.Context()
 		errorMessage string = "Task successfully added to module"
 	)
@@ -198,7 +199,7 @@ func (h *ModuleHandler) AddTasksByLvl(ctx *fiber.Ctx) error {
 	}
 
 	// 2 - get the struct
-	temp := &task.Task{
+	temp := &models.Task{
 		TaskID:   taskID,
 		TypeID:   receivedTask.TypeID,
 		Level:    receivedTask.Level,
@@ -220,7 +221,7 @@ func (h *ModuleHandler) AddTasksByLvl(ctx *fiber.Ctx) error {
 
 	params.ModuleId = moduleID
 
-	err = h.UC.AddTask(context_, params)
+	err = h.UC.AddTask(context_, &params)
 	if err != nil {
 		err = ctx.Status(fiber.StatusInternalServerError).SendString(err.Error())
 		if err != nil {

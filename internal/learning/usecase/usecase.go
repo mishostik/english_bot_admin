@@ -3,6 +3,7 @@ package usecase
 import (
 	"context"
 	"english_bot_admin/internal/learning"
+	"english_bot_admin/internal/models"
 	"fmt"
 	"github.com/google/uuid"
 )
@@ -15,8 +16,8 @@ func NewLearnUsecase(learnRepo learning.Repository) learning.Usecase {
 	return &LearnUseCase{repo: learnRepo}
 }
 
-func (u *LearnUseCase) AddRule(ctx context.Context, rule *learning.NewRuleParams) error {
-	temp := &learning.Rule{
+func (u *LearnUseCase) AddRule(ctx context.Context, rule *models.NewRuleParams) error {
+	temp := &models.Rule{
 		RuleID:   uuid.New(),
 		ModuleID: rule.ModuleID,
 		Info:     rule.Info,
@@ -30,9 +31,9 @@ func (u *LearnUseCase) AddRule(ctx context.Context, rule *learning.NewRuleParams
 	return nil
 }
 
-func (u *LearnUseCase) GetAllRules(ctx context.Context) ([]learning.Rule, error) {
+func (u *LearnUseCase) GetAllRules(ctx context.Context) ([]models.Rule, error) {
 	var (
-		rules []learning.Rule
+		rules []models.Rule
 		err   error
 	)
 

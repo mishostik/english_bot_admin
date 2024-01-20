@@ -3,6 +3,7 @@ package http
 import (
 	"bytes"
 	"english_bot_admin/internal/learning"
+	"english_bot_admin/internal/models"
 	"github.com/gofiber/fiber/v2"
 	"html/template"
 )
@@ -17,7 +18,7 @@ func NewLearnHandler(UC learning.Usecase) *LearnHandler {
 	}
 }
 
-func (h *LearnHandler) renderRules(ctx *fiber.Ctx, rules []learning.Rule) {
+func (h *LearnHandler) renderRules(ctx *fiber.Ctx, rules []models.Rule) {
 	tmpl, err := template.ParseFiles("templates/rules.html")
 	if err != nil {
 		err = ctx.Status(fiber.StatusInternalServerError).SendString(err.Error())
@@ -28,7 +29,7 @@ func (h *LearnHandler) renderRules(ctx *fiber.Ctx, rules []learning.Rule) {
 	}
 
 	data := struct {
-		Rules []learning.Rule
+		Rules []models.Rule
 	}{
 		Rules: rules,
 	}
@@ -50,7 +51,7 @@ func (h *LearnHandler) renderRules(ctx *fiber.Ctx, rules []learning.Rule) {
 
 func (h *LearnHandler) AddRule(ctx *fiber.Ctx) error {
 	var (
-		params   learning.NewRuleParams
+		params   models.NewRuleParams
 		context_ = ctx.Context()
 		err      error
 	)

@@ -2,18 +2,14 @@ package task
 
 import (
 	"context"
+	"english_bot_admin/internal/models"
 	"github.com/google/uuid"
 )
 
 type Repository interface {
-	//GetTasks() ([]Task, error)
-	GetTaskByID(context context.Context, uuid uuid.UUID) (*Task, error)
-	InsertTask(ctx context.Context, task *Task) (uuid.UUID, error)
-	GetTasks(ctx context.Context) ([]Task, error)
-	//GetTasks(context_ *fasthttp.RequestCtx) (interface{}, interface{})
-	UpdateTaskInfoByUUID(ctx context.Context, task *Task) error
-	//UpdateTask(taskID int, task *Task) error
-	//DeleteTask(taskID int) error
-
-	GetTasksByLvl(ctx context.Context, lvl string) ([]Task, error)
+	GetTaskByID(context context.Context, uuid uuid.UUID) (*models.Task, error)
+	InsertTask(ctx context.Context, task *models.Task) (uuid.UUID, error)
+	GetTasks(ctx context.Context) ([]models.Task, error)
+	UpdateTaskInfoByUUID(ctx context.Context, task *models.Task) error
+	GetTasksByLvl(ctx context.Context, lvl string) ([]models.Task, error)
 }

@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"english_bot_admin/internal/models"
 	"english_bot_admin/internal/user"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -18,9 +19,9 @@ func NewUserRepository(userCollection *mongo.Collection) user.Repository {
 	}
 }
 
-func (r *UserRepository) Select(ctx context.Context) ([]user.User, error) {
+func (r *UserRepository) Select(ctx context.Context) ([]models.User, error) {
 	filter := bson.M{}
-	var users []user.User
+	var users []models.User
 	cursor, err := r.userCollection.Find(ctx, filter)
 	if err != nil {
 		return nil, err
@@ -35,4 +36,8 @@ func (r *UserRepository) Select(ctx context.Context) ([]user.User, error) {
 		return nil, err
 	}
 	return users, nil
+}
+
+func (r *UserRepository) AdminVerification(ctx context.Context, params *models.AdminSignInParams) (bool, error) {
+	return false, nil
 }

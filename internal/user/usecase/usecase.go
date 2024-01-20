@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"context"
+	"english_bot_admin/internal/models"
 	"english_bot_admin/internal/user"
 )
 
@@ -15,10 +16,10 @@ func NewUserUsecase(repo user.Repository) user.Usecase {
 	}
 }
 
-func (u *UserUsecase) GetAll(context_ context.Context) ([]user.User, error) {
+func (u *UserUsecase) GetAll(context_ context.Context) ([]models.User, error) {
 	users, err := u.repo.Select(context_)
 	if err != nil {
-		return []user.User{}, err
+		return []models.User{}, err
 	}
 	return users, nil
 }

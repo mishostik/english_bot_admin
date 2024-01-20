@@ -3,7 +3,7 @@ package http
 import (
 	"bytes"
 	"english_bot_admin/internal/incorrect"
-	"english_bot_admin/internal/incorrect/models"
+	"english_bot_admin/internal/models"
 	"english_bot_admin/internal/task"
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
@@ -26,7 +26,7 @@ func NewTaskHandler(taskUseCase task.Usecase, taskRepo task.Repository, incRepo 
 	}
 }
 
-func (h *TaskHandler) RenderTasks(ctx *fiber.Ctx, tasks []task.Task) {
+func (h *TaskHandler) RenderTasks(ctx *fiber.Ctx, tasks []models.Task) {
 	tmpl, err := template.ParseFiles("templates/tasks.html")
 	if err != nil {
 		err = ctx.Status(fiber.StatusInternalServerError).SendString(err.Error())
@@ -37,7 +37,7 @@ func (h *TaskHandler) RenderTasks(ctx *fiber.Ctx, tasks []task.Task) {
 	}
 
 	data := struct {
-		Tasks []task.Task
+		Tasks []models.Task
 	}{
 		Tasks: tasks,
 	}
@@ -89,7 +89,7 @@ func (h *TaskHandler) EditTask(ctx *fiber.Ctx) error {
 	if err != nil {
 		errorMessage = "Error task type converting to integer"
 	}
-	editTask := &task.Task{
+	editTask := &models.Task{
 		TaskID:   taskUuid,
 		TypeID:   uint8(taskTypeInt),
 		Level:    level,
@@ -135,7 +135,7 @@ func (h *TaskHandler) CreateTask(ctx *fiber.Ctx) error {
 
 	taskTypeInt, err := strconv.Atoi(taskType)
 
-	newTask := &task.Task{
+	newTask := &models.Task{
 		TaskID:   uuid.New(),
 		TypeID:   uint8(taskTypeInt),
 		Level:    level,

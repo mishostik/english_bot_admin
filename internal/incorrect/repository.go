@@ -2,7 +2,7 @@ package incorrect
 
 import (
 	"context"
-	"english_bot_admin/internal/incorrect/models"
+	"english_bot_admin/internal/models"
 	"github.com/google/uuid"
 )
 
