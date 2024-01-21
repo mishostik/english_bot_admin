@@ -51,6 +51,11 @@ type TaskToModule struct {
 	Task *Task `json:"task" bson:"task"`
 }
 
+type AddTaskByLvlParams struct {
+	TaskId   uuid.UUID `json:"task_id"`
+	ModuleId uuid.UUID `json:"module_id"`
+}
+
 type Task struct {
 	TaskID   uuid.UUID `bson:"task_id" json:"task_id,omitempty"`
 	TypeID   uint8     `bson:"type_id" json:"type_id"`
@@ -76,9 +81,21 @@ type TasksResponseModel struct {
 	Data    []Task `json:"data"`
 }
 
+type TasksByLvlResponseModel struct {
+	Success bool       `json:"success"`
+	Error   string     `json:"error"`
+	Data    []ByModule `json:"data"`
+}
+
 type ResponseModel struct {
 	Success bool   `json:"success"`
 	Error   string `json:"error"`
+}
+
+type ModulesResponseModel struct {
+	Success bool     `json:"success"`
+	Error   string   `json:"error"`
+	Data    []Module `json:"data"`
 }
 
 type ByModule struct {
@@ -111,4 +128,10 @@ type Admin struct {
 	Login        string    `bson:"login"`
 	Password     string    `bson:"password"`
 	RegisteredAt time.Time `bson:"registered_at"`
+}
+
+type UsersResponseModel struct {
+	Data    []User `json:"data"`
+	Success bool   `json:"success"`
+	Error   string `json:"error"`
 }

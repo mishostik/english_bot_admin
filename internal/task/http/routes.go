@@ -8,5 +8,5 @@ func TaskRoutes(app *fiber.App, h *TaskHandler) {
 	taskGroup := app.Group("/task")
 	taskGroup.Get("/all", h.GetTasks)
 	taskGroup.Post("/new", h.CreateTask)
-	taskGroup.Post("/edit/:id", h.EditTask)
+	taskGroup.Post("/edit", h.EditTask)
 }

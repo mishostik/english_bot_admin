@@ -1,12 +1,9 @@
 package http
 
 import (
-	"bytes"
 	"english_bot_admin/internal/models"
 	"english_bot_admin/internal/user"
-	"fmt"
 	"github.com/gofiber/fiber/v2"
-	"html/template"
 )
 
 type UserHandler struct {
@@ -19,48 +16,20 @@ func NewUserHandler(ucase user.Usecase) *UserHandler {
 	}
 }
 
-func renderUsers(ctx *fiber.Ctx, users []models.User) {
-	tmpl, err := template.ParseFiles("templates/users.html")
-	if err != nil {
-		err = ctx.Status(fiber.StatusInternalServerError).SendString(err.Error())
-		if err != nil {
-			return
-		}
-		return
-	}
-
-	data := struct {
-		Users  []models.User
-		Amount int
-	}{
-		Users:  users,
-		Amount: len(users),
-	}
-
-	var buf bytes.Buffer
-	if err = tmpl.Execute(&buf, data); err != nil {
-		err = ctx.Status(fiber.StatusInternalServerError).SendString(err.Error())
-		if err != nil {
-			return
-		}
-		return
-	}
-	ctx.Set("Content-Type", "text/html")
-	err = ctx.Status(fiber.StatusOK).Send(buf.Bytes())
-	if err != nil {
-		return
-	}
-}
-
 func (h *UserHandler) GetAll(ctx *fiber.Ctx) error {
-	context_ := ctx.Context()
+	var (
+		context_                            = ctx.Context()
+		response *models.UsersResponseModel = &models.UsersResponseModel{}
+	)
 	users, err := h.uc.GetAll(context_)
 	if err != nil {
-		return err
+		response.Error = err.Error()
+		return ctx.Status(fiber.StatusInternalServerError).JSON(response)
 	}
 
-	renderUsers(ctx, users)
-	return nil
+	response.Success = true
+	response.Data = users
+	return ctx.Status(fiber.StatusOK).JSON(response)
 }
 
 func (h *UserHandler) AdminSignIn(ctx *fiber.Ctx) error {
@@ -72,8 +41,6 @@ func (h *UserHandler) AdminSignIn(ctx *fiber.Ctx) error {
 
 		err error
 	)
-
-	fmt.Println("handler of admin authorization")
 
 	if err = ctx.BodyParser(&params); err != nil {
 		return ctx.SendStatus(fiber.StatusBadRequest)
