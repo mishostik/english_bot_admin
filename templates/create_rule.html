@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <link rel="stylesheet" type="text/css" href="/dark-styles.css">
+    <meta charset="UTF-8">
+    <title> Creating </title>
+</head>
+
+<body>
+<div class="links">
+    <a href="/"> Main </a>
+    <a href="/learn/rule/all"> List of rules </a>
+</div>
+
+<h3> Rule creating </h3>
+<div class="content">
+    <form action="/learn/rule/new" method="POST" enctype="multipart/form-data">
+        <div class="module_setting">
+            <label for="Topic">Topic:</label>
+            <input type="text" id="Topic" name="Topic" required>
+
+            <label for="Info">Info:</label>
+            <input type="text" id="Info" name="Info" required>
+
+<!--            list of modules with select                                    -->
+            <label for="Module">Module:</label>
+            <input type="text" id="Module" name="Module" required>
+
+<!--            <h4> Upload Image </h4>-->
+<!--            <form action="/upload" method="post" enctype="multipart/form-data">-->
+            <label for="Image">Choose an image:</label>
+            <input type="file" id="Image" name="Image" accept="image/*">
+            <br>
+<!--            <input type="submit" value="Upload">-->
+<!--            </form>-->
+
+        </div>
+        <button type="submit"> Save </button>
+    </form>
+</div>
+
+</body>
+</html>

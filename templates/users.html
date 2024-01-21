@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="stylesheet" type="text/css" href="/dark-styles.css">
+  <meta charset="UTF-8">
+  <title>Users</title>
+</head>
+<body>
+
+<div class="links">
+  <a href="/"> Main </a>
+</div>
+
+<h2>Users</h2>
+  <h3><p>Users amount:</p> {{ .Amount }}</h3>
+
+<div class="users">
+  {{ range .Users }}
+  <div class="user">
+    <div class="span-wrap">
+      <div class="user-info"><h4>Username:</h4> {{ .Username }} </div>
+      <div class="user-info"><h4>Registered at:</h4> {{ .RegisteredAt }}</div>
+      <div class="user-info"><h4>Last active at:</h4> {{ .LastActiveAt }}</div>
+      <div class="user-info"><h4>Level:</h4> {{ .Level }}</div>
+    </div>
+  </div>
+  {{ end }}
+</div>
+</body>
+</html>

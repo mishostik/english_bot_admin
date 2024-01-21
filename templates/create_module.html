@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <link rel="stylesheet" type="text/css" href="/dark-styles.css">
+  <meta charset="UTF-8">
+  <title> Creating </title>
+</head>
+
+<body>
+<div class="links">
+  <a href="/"> Main </a>
+  <a href="/module/all"> List of modules </a>
+</div>
+
+<h3> Module creating </h3>
+<div class="content">
+  <form action="/module/new" method="POST">
+    <div class="module_setting">
+      <label for="Title">Title:</label>
+      <input type="text" id="Title" name="Title" required>
+    </div>
+    <div class="module_setting">
+      <label for="level">Level:</label>
+      <select id="level" name="level">
+        <option value="A0"> A0 </option>
+        <option value="A1"> A1 </option>
+        <option value="A2"> A2 </option>
+        <option value="B1"> B1 </option>
+        <option value="B2"> B2 </option>
+        <option value="C1"> C1 </option>
+      </select>
+    </div>
+    <button type="submit"> Save </button>
+  </form>
+</div>
+
+</body>
+</html>

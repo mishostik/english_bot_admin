@@ -1,19 +1,30 @@
 <!DOCTYPE html>
-<html lang="">
+<html lang="en">
 <head>
+  <link rel="stylesheet" type="text/css" href="/dark-styles.css">
+  <meta charset="UTF-8">
   <title>Tasks</title>
 </head>
 <body>
-<h1>Tasks</h1>
-<ul>
-  {{range .}}
-  <li>
-    <strong>Type ID:</strong> {{.TypeID}} <br>
-    <strong>Level:</strong> {{.Level}} <br>
-    <strong>Question:</strong> {{.Question}} <br>
-    <strong>Answer:</strong> {{.Answer}} <br>
-  </li>
-  {{end}}
-</ul>
+<div class="links">
+  <a href="/"> Main </a>
+  <a href="/task/new"> New task </a>
+</div>
+<h2>Tasks</h2>
+<div class="task-container_inner">
+
+  {{ range .Tasks }}
+    <div class="task">
+<!--      <div class="task-wrap">-->
+        <div><p>TypeID:</p> {{ .TypeID }} </div>
+        <div class="task-level"><p>Level:</p> {{ .Level }} </div>
+        <div class="task-question-short"><p>Question:</p> {{ .Question }} </div>
+        <div class="task-answer"><p>Answer:</p> {{ .Answer }} </div>
+<!--      </div>-->
+      <a href="/task/edit/{{.TaskID}}" class="edit-link"> edit </a>
+    </div>
+  {{ end }}
+
+</div>
 </body>
 </html>

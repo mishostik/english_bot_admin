@@ -1,120 +1,118 @@
 package http
 
 import (
-	"encoding/json"
-	model "english_bot_admin/internal/task/model"
-	tr "english_bot_admin/internal/task/repository"
-	uc "english_bot_admin/internal/task/usecase"
-
-	"go.mongodb.org/mongo-driver/mongo"
-
-	"log"
-	"strconv"
-
+	"english_bot_admin/internal/incorrect"
+	"english_bot_admin/internal/models"
+	"english_bot_admin/internal/task"
 	"github.com/gofiber/fiber/v2"
+	"github.com/google/uuid"
 )
 
 type TaskHandler struct {
-	useCase  *uc.TaskUsecase
-	taskRepo *tr.MongoTaskRepository
+	uc          task.Usecase
+	taskRepo    task.Repository
+	incorrectUC incorrect.Usecase
 }
 
-func NewTaskHandler(taskCollection *mongo.Collection, typeCollection *mongo.Collection) *TaskHandler {
+func NewTaskHandler(taskUC task.Usecase, taskRepo task.Repository, incUC incorrect.Usecase) *TaskHandler {
 	return &TaskHandler{
-		useCase:  uc.NewTaskUsecase(),
-		taskRepo: tr.NewMongoTaskRepository(taskCollection, typeCollection),
+		uc:          taskUC,
+		taskRepo:    taskRepo,
+		incorrectUC: incUC,
 	}
 }
 
 func (h *TaskHandler) GetTasks(ctx *fiber.Ctx) error {
-	context_ := ctx.Context()
-	tasks, err := h.taskRepo.GetTasks(context_)
+	var (
+		context_                            = ctx.Context()
+		response *models.TasksResponseModel = &models.TasksResponseModel{}
+	)
+	tasks, err := h.uc.GetTasks(context_)
 	if err != nil {
-		return nil
+		response.Error = err.Error()
+		return ctx.Status(fiber.StatusInternalServerError).JSON(response)
 	}
-	jsonTasks, err := json.Marshal(tasks)
+
+	response.Success = true
+	response.Data = tasks
+	return ctx.Status(fiber.StatusOK).JSON(response)
+}
+
+func (h *TaskHandler) EditTask(ctx *fiber.Ctx) error {
+	var (
+		context_ = ctx.Context()
+		params   models.TaskWithAnswers
+		response *models.ResponseModel = &models.ResponseModel{}
+
+		err error
+	)
+
+	if err = ctx.BodyParser(&params); err != nil {
+		return ctx.SendStatus(fiber.StatusBadRequest)
+	}
+
+	editTask := &models.Task{
+		TaskID:   params.TaskID,
+		TypeID:   params.TypeID,
+		Level:    params.Level,
+		Question: params.Question,
+		Answer:   params.Answer,
+	}
+
+	err = h.uc.UpdateTaskInfoByUUID(context_, editTask)
 	if err != nil {
-		return err
+		response.Error = err.Error()
+		return ctx.Status(fiber.StatusInternalServerError).JSON(response)
 	}
-	return ctx.Render("../templates/tasks.html", jsonTasks)
+
+	incAnswers := &models.IncorrectAnswers{
+		A: params.A,
+		B: params.B,
+		C: params.C,
+	}
+
+	err = h.incorrectUC.UpdateForTask(context_, params.TaskID, incAnswers)
+	if err != nil {
+		response.Error = err.Error()
+		return ctx.Status(fiber.StatusInternalServerError).JSON(response)
+	}
+
+	response.Success = true
+	return ctx.SendStatus(fiber.StatusOK)
 }
 
 func (h *TaskHandler) CreateTask(ctx *fiber.Ctx) error {
-	context_ := ctx.Context()
-	taskType := ctx.FormValue("type")
-	level := ctx.FormValue("level")
-	question := ctx.FormValue("question")
-	answer := ctx.FormValue("answer")
-	log.Println(taskType, level, question, answer)
-
-	taskTypeInt, err := strconv.Atoi(taskType)
-
-	newTask := &model.Task{
-		TypeID:   uint8(taskTypeInt),
-		Level:    level,
-		Question: question,
-		Answer:   answer,
-	}
-	err = h.taskRepo.NewTask(context_, newTask)
-	if err != nil {
-		return err
-	}
-	if err != nil {
-		return nil
-	}
-	return ctx.SendString("Task created successfully!")
-}
-
-func (h *TaskHandler) UpdateTask(ctx *fiber.Ctx) error {
-	context_ := ctx.Context()
-	task := &model.Task{
-		// updaload fields from form
-	}
-	err := h.taskRepo.UpdateTask(context_, 1, task)
-	if err != nil {
-		log.Println(err.Error())
-	}
-	return nil
-}
-
-func (h *TaskHandler) GetTaskByID(ctx *fiber.Ctx) error {
-	context_ := ctx.Context()
-	taskID := ctx.Params("id")
-
-	id, err := strconv.Atoi(taskID)
-	if err != nil {
-		return err
-	}
-
-	task, err := h.taskRepo.GetTaskByID(context_, id)
-	if err != nil {
-		log.Println(err.Error())
-	}
-
-	jsonTask, err := json.Marshal(task)
-	if err != nil {
-		return err
-	}
-
-	return ctx.Render("../templates/task.html", jsonTask)
-}
-
-func (h *TaskHandler) DeleteTask(ctx *fiber.Ctx) error {
 	var (
-		err error
-		id  int
+		context_   = ctx.Context()
+		params     models.TaskWithAnswers
+		response   *models.ResponseModel = &models.ResponseModel{}
+		internalId uuid.UUID
+		err        error
 	)
-	context_ := ctx.Context()
-	taskID := ctx.Params("id")
 
-	id, err = strconv.Atoi(taskID)
-	if err != nil {
-		return err
+	if err = ctx.BodyParser(&params); err != nil {
+		return ctx.SendStatus(fiber.StatusBadRequest)
 	}
 
-	err = h.taskRepo.DeleteTask(context_, id)
-	if err != nil {
-		log.Println(err.Error())
+	newTask := &models.Task{
+		TaskID:   uuid.New(),
+		TypeID:   params.TypeID,
+		Level:    params.Level,
+		Question: params.Question,
+		Answer:   params.Answer,
 	}
-	return ctx.SendString("Task deleted successfully")
+
+	internalId, err = h.uc.CreateTask(context_, newTask)
+	if err != nil {
+		response.Error = err.Error()
+		return ctx.Status(fiber.StatusInternalServerError).JSON(response)
+	}
+
+	err = h.incorrectUC.AddForTask(context_, internalId, params.A, params.B, params.C)
+	if err != nil {
+		response.Error = err.Error()
+		return ctx.Status(fiber.StatusInternalServerError).JSON(response)
+	}
+
+	return ctx.SendStatus(fiber.StatusOK)
 }

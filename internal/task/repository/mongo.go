@@ -2,9 +2,11 @@ package task
 
 import (
 	"context"
-	model "english_bot_admin/internal/task/model"
+	"english_bot_admin/internal/models"
+	model "english_bot_admin/internal/task"
 	"errors"
 	"fmt"
+	"github.com/google/uuid"
 	"log"
 
 	"go.mongodb.org/mongo-driver/bson"
@@ -16,17 +18,17 @@ type MongoTaskRepository struct {
 	typeCollection *mongo.Collection
 }
 
-func NewMongoTaskRepository(taskCollection *mongo.Collection, typeCollection *mongo.Collection) *MongoTaskRepository {
+func NewMongoTaskRepository(taskCollection *mongo.Collection, typeCollection *mongo.Collection) model.Repository {
 	return &MongoTaskRepository{
 		taskCollection: taskCollection,
 		typeCollection: typeCollection,
 	}
 }
 
-func (mr *MongoTaskRepository) GetTasks(ctx context.Context) ([]model.Task, error) {
+func (r *MongoTaskRepository) GetTasks(ctx context.Context) ([]models.Task, error) {
 	filter := bson.M{}
-	var tasks []model.Task
-	cursor, err := mr.taskCollection.Find(ctx, filter)
+	var tasks []models.Task
+	cursor, err := r.taskCollection.Find(ctx, filter)
 	if err != nil {
 		log.Println("error while getting tasks:", err)
 		return nil, err
@@ -44,10 +46,10 @@ func (mr *MongoTaskRepository) GetTasks(ctx context.Context) ([]model.Task, erro
 	return tasks, nil
 }
 
-func (mr *MongoTaskRepository) GetTaskByID(ctx context.Context, taskID int) (*model.Task, error) {
+func (r *MongoTaskRepository) GetTaskByID(ctx context.Context, taskID uuid.UUID) (*models.Task, error) {
 	filter := bson.M{"task_id": taskID}
-	var task model.Task
-	err := mr.taskCollection.FindOne(ctx, filter).Decode(&task)
+	var task models.Task
+	err := r.taskCollection.FindOne(ctx, filter).Decode(&task)
 	if err != nil {
 		if errors.Is(err, mongo.ErrNoDocuments) {
 			log.Println("error no documents")
@@ -58,38 +60,101 @@ func (mr *MongoTaskRepository) GetTaskByID(ctx context.Context, taskID int) (*mo
 	return &task, err
 }
 
-func (mr *MongoTaskRepository) NewTask(ctx context.Context, task *model.Task) error {
-	_, err := mr.taskCollection.InsertOne(ctx, task)
+func (r *MongoTaskRepository) InsertTask(ctx context.Context, task *models.Task) (uuid.UUID, error) {
+	_, err := r.taskCollection.InsertOne(ctx, task)
 	if err != nil {
-		return fmt.Errorf("error while adding task: %w", err)
+		return uuid.Nil, fmt.Errorf("error while adding task: %w", err)
 	}
-	log.Println("task added")
-	return nil
+	log.Printf("Task added with ID: %s\n", task.TaskID)
+	return task.TaskID, nil
 }
 
-func (mr *MongoTaskRepository) UpdateTask(ctx context.Context, taskID int, task *model.Task) error {
-	filter := bson.M{"task_id": taskID}
+func (r *MongoTaskRepository) UpdateTaskInfoByUUID(ctx context.Context, task *models.Task) error {
+	filter := bson.M{"task_id": task.TaskID}
 	update := bson.M{
 		"$set": bson.M{
 			"type_id":  task.TypeID,
 			"level":    task.Level,
 			"question": task.Question,
 			"answer":   task.Answer,
+			"task_id":  task.TaskID,
 		},
 	}
-	_, err := mr.taskCollection.UpdateOne(ctx, filter, update)
+	_, err := r.taskCollection.UpdateOne(ctx, filter, update)
 	if err != nil {
-		log.Println("error while updating task:", err)
+		log.Println("updating task in mongo db error")
 		return err
 	}
 	return nil
 }
 
-func (mr *MongoTaskRepository) DeleteTask(ctx context.Context, taskID int) error {
+func (r *MongoTaskRepository) UpdateTaskUUID(ctx context.Context, task *models.Task) error {
+	filter := bson.M{"question": task.Question}
+	update := bson.M{
+		"$set": bson.M{
+			"type_id":  task.TypeID,
+			"level":    task.Level,
+			"question": task.Question,
+			"answer":   task.Answer,
+			"task_id":  task.TaskID,
+		},
+	}
+
+	_, err := r.taskCollection.UpdateOne(ctx, filter, update)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (r *MongoTaskRepository) DeleteTask(ctx context.Context, taskID int) error {
 	filter := bson.M{"_id": taskID}
-	_, err := mr.taskCollection.DeleteOne(ctx, filter)
+	_, err := r.taskCollection.DeleteOne(ctx, filter)
 	if err != nil {
 		return err
 	}
 	return nil
+}
+
+func (r *MongoTaskRepository) GetTasksWithoutUUID(ctx context.Context) ([]models.Task, error) {
+	filter := bson.M{"task_id": nil}
+	var tasks []models.Task
+
+	cursor, err := r.taskCollection.Find(ctx, filter)
+	if err != nil {
+		return nil, err
+	}
+
+	defer func() {
+		_ = cursor.Close(ctx)
+	}()
+
+	if err := cursor.All(ctx, &tasks); err != nil {
+		return nil, err
+	}
+
+	return tasks, nil
+}
+
+func (r *MongoTaskRepository) GetTasksByLvl(ctx context.Context, lvl string) ([]models.Task, error) {
+	log.Println("level is:", lvl)
+	filter := bson.M{"level": lvl}
+	var tasks []models.Task
+
+	cursor, err := r.taskCollection.Find(ctx, filter)
+	if err != nil {
+		return nil, err
+	}
+
+	defer func() {
+		_ = cursor.Close(ctx)
+	}()
+
+	if err = cursor.All(ctx, &tasks); err != nil {
+		log.Println("err or len:", err, tasks)
+		return nil, err
+	}
+
+	return tasks, nil
 }
