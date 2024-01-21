@@ -7,7 +7,7 @@ import (
 )
 
 type Repository interface {
-	AddForNewTask(ctx context.Context, taskId uuid.UUID, a string, b string, c string) error
+	InsertForNewTask(ctx context.Context, taskId uuid.UUID, a string, b string, c string) error
 	UpdateForTask(ctx context.Context, taskId uuid.UUID, answers *models.IncorrectAnswers) error
-	GetAnswersForTask(ctx context.Context, taskId uuid.UUID) (*models.IncorrectAnswers, error)
+	SelectAnswersForTask(ctx context.Context, taskId uuid.UUID) (*models.IncorrectAnswers, error)
 }

@@ -22,7 +22,7 @@ func NewIncorrectRepository(incAnswers *mongo.Collection) incorrect.Repository {
 	}
 }
 
-func (r *IncorrectRepository) AddForNewTask(ctx context.Context, taskId uuid.UUID, a string, b string, c string) error {
+func (r *IncorrectRepository) InsertForNewTask(ctx context.Context, taskId uuid.UUID, a string, b string, c string) error {
 	result := &models.IncorrectAnswers{
 		TaskID: taskId,
 		A:      a,
@@ -51,7 +51,7 @@ func (r *IncorrectRepository) UpdateForTask(ctx context.Context, taskId uuid.UUI
 		return err
 	}
 	if res.ModifiedCount == 0 {
-		err := r.AddForNewTask(ctx, taskId, answers.A, answers.B, answers.C)
+		err := r.InsertForNewTask(ctx, taskId, answers.A, answers.B, answers.C)
 		if err != nil {
 			return err
 		}
@@ -59,7 +59,7 @@ func (r *IncorrectRepository) UpdateForTask(ctx context.Context, taskId uuid.UUI
 	return nil
 }
 
-func (r *IncorrectRepository) GetAnswersForTask(ctx context.Context, taskId uuid.UUID) (*models.IncorrectAnswers, error) {
+func (r *IncorrectRepository) SelectAnswersForTask(ctx context.Context, taskId uuid.UUID) (*models.IncorrectAnswers, error) {
 	filter := bson.M{"task_id": taskId}
 	var answers models.IncorrectAnswers
 	err := r.incAnswers.FindOne(ctx, filter).Decode(&answers)

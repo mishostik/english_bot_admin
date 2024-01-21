@@ -24,11 +24,6 @@ func (s *Server) Run() error {
 	)
 	s.app.Static("/", "./templates/styles")
 
-	//err = godotenv.Load(".env")
-	//if err != nil {
-	//	log.Fatal("Error loading .env file")
-	//}
-
 	dbURI := os.Getenv("DB_URI")
 	dbName := os.Getenv("DB_NAME")
 

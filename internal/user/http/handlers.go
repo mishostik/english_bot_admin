@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"english_bot_admin/internal/models"
 	"english_bot_admin/internal/user"
+	"fmt"
 	"github.com/gofiber/fiber/v2"
 	"html/template"
 )
@@ -71,6 +72,8 @@ func (h *UserHandler) AdminSignIn(ctx *fiber.Ctx) error {
 
 		err error
 	)
+
+	fmt.Println("handler of admin authorization")
 
 	if err = ctx.BodyParser(&params); err != nil {
 		return ctx.SendStatus(fiber.StatusBadRequest)

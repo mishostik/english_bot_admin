@@ -13,16 +13,16 @@ import (
 )
 
 type TaskHandler struct {
-	useCase        task.Usecase
-	taskRepo       task.Repository
-	incAnswersRepo incorrect.Repository
+	uc          task.Usecase
+	taskRepo    task.Repository
+	incorrectUC incorrect.Usecase
 }
 
-func NewTaskHandler(taskUseCase task.Usecase, taskRepo task.Repository, incRepo incorrect.Repository) *TaskHandler {
+func NewTaskHandler(taskUC task.Usecase, taskRepo task.Repository, incUC incorrect.Usecase) *TaskHandler {
 	return &TaskHandler{
-		useCase:        taskUseCase,
-		taskRepo:       taskRepo,
-		incAnswersRepo: incRepo,
+		uc:          taskUC,
+		taskRepo:    taskRepo,
+		incorrectUC: incUC,
 	}
 }
 
@@ -59,7 +59,7 @@ func (h *TaskHandler) RenderTasks(ctx *fiber.Ctx, tasks []models.Task) {
 
 func (h *TaskHandler) GetTasks(ctx *fiber.Ctx) error {
 	context_ := ctx.Context()
-	tasks, err := h.useCase.GetTasks(context_)
+	tasks, err := h.uc.GetTasks(context_)
 	if err != nil {
 		err = ctx.Status(fiber.StatusInternalServerError).SendString(err.Error())
 		if err != nil {
@@ -97,7 +97,7 @@ func (h *TaskHandler) EditTask(ctx *fiber.Ctx) error {
 		Answer:   answer,
 	}
 
-	err = h.useCase.UpdateTaskInfoByUUID(context_, editTask)
+	err = h.uc.UpdateTaskInfoByUUID(context_, editTask)
 	if err != nil {
 		errorMessage = "Updating task info error"
 	}
@@ -112,9 +112,7 @@ func (h *TaskHandler) EditTask(ctx *fiber.Ctx) error {
 		C: incAnswerC,
 	}
 
-	// TODO: 3
-
-	err = h.incAnswersRepo.UpdateForTask(context_, taskUuid, incAnswers)
+	err = h.incorrectUC.UpdateForTask(context_, taskUuid, incAnswers)
 	if err != nil {
 		errorMessage = "Updating of incorrect answers error"
 	}
@@ -143,7 +141,7 @@ func (h *TaskHandler) CreateTask(ctx *fiber.Ctx) error {
 		Answer:   answer,
 	}
 
-	internalId, err = h.useCase.CreateTask(context_, newTask)
+	internalId, err = h.uc.CreateTask(context_, newTask)
 	if err != nil {
 		return err
 	}
@@ -155,9 +153,7 @@ func (h *TaskHandler) CreateTask(ctx *fiber.Ctx) error {
 	incAnswerB := ctx.FormValue("incorrectB")
 	incAnswerC := ctx.FormValue("incorrectC")
 
-	// TODO: 3
-
-	err = h.incAnswersRepo.AddForNewTask(context_, internalId, incAnswerA, incAnswerB, incAnswerC)
+	err = h.incorrectUC.AddForTask(context_, internalId, incAnswerA, incAnswerB, incAnswerC)
 	if err != nil {
 		return err
 	}
@@ -176,7 +172,7 @@ func (h *TaskHandler) GetEditTaskForm(ctx *fiber.Ctx) error {
 	if err != nil {
 		return err
 	}
-	task_, err := h.useCase.GetTaskById(context_, uuid_)
+	task_, err := h.uc.GetTaskById(context_, uuid_)
 	if err != nil {
 		return err
 	}
@@ -184,9 +180,7 @@ func (h *TaskHandler) GetEditTaskForm(ctx *fiber.Ctx) error {
 		log.Panic("задачи для редактирования нет")
 	}
 
-	// TODO: 4
-
-	insAnswers, err := h.incAnswersRepo.GetAnswersForTask(context_, uuid_)
+	insAnswers, err := h.incorrectUC.GetAnswersForTask(context_, uuid_)
 	if err != nil {
 		log.Println("Error getting incorrect answers")
 		return err

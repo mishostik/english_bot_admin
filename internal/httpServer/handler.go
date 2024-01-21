@@ -4,6 +4,7 @@ import (
 	"english_bot_admin/database"
 	"english_bot_admin/internal/httpServer/cconstants"
 	incAnswersRepository "english_bot_admin/internal/incorrect/repository"
+	incUseCase "english_bot_admin/internal/incorrect/usecase"
 	ruleHttp "english_bot_admin/internal/learning/http"
 	ruleRepository "english_bot_admin/internal/learning/repository"
 	ruleUseCase "english_bot_admin/internal/learning/usecase"
@@ -65,12 +66,13 @@ func MapHandlers(db *database.Database, s *Server) error {
 
 	moduleUC := moduleUseCase.NewModuleUsecase(*moduleRepo)
 	taskUC := taskUseCase.NewTaskUsecase(taskRepo)
+	incUC := incUseCase.NewIncorrectUsecase(incAnswersRepo)
 	userUC := userUseCase.NewUserUsecase(userRepo)
 	ruleUC := ruleUseCase.NewLearnUsecase(ruleRepo)
 
 	// --------------------------- handlers ---------------------------
 
-	taskHandler := taskHttp.NewTaskHandler(taskUC, taskRepo, incAnswersRepo)
+	taskHandler := taskHttp.NewTaskHandler(taskUC, taskRepo, incUC)
 	taskHttp.TaskRoutes(s.app, taskHandler)
 
 	moduleHandler := http.NewModuleHandler(moduleUC, taskUC)
