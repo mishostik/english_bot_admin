@@ -22,7 +22,6 @@ func (s *Server) Run() error {
 	var (
 		err error
 	)
-	s.app.Static("/", "./templates/styles")
 
 	dbURI := os.Getenv("DB_URI")
 	dbName := os.Getenv("DB_NAME")

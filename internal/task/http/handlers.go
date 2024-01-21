@@ -6,6 +6,7 @@ import (
 	"english_bot_admin/internal/task"
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
+	_ "github.com/swaggo/swag"
 )
 
 type TaskHandler struct {
@@ -22,6 +23,14 @@ func NewTaskHandler(taskUC task.Usecase, taskRepo task.Repository, incUC incorre
 	}
 }
 
+// GetTasks
+// @Summary GetTasks
+// @Description Get all tasks
+// @ID get-all-tasks
+// @Produce json
+// @Success 200 {object} models.TasksResponseModel
+// @Failure 500 {object} models.TasksResponseModel
+// @Router /task/all [get]
 func (h *TaskHandler) GetTasks(ctx *fiber.Ctx) error {
 	var (
 		context_                            = ctx.Context()
@@ -38,6 +47,15 @@ func (h *TaskHandler) GetTasks(ctx *fiber.Ctx) error {
 	return ctx.Status(fiber.StatusOK).JSON(response)
 }
 
+// EditTask
+// @Summary EditTask
+// @Description Edit task
+// @ID edit-task
+// @Produce json
+// @Param request body models.TaskWithAnswers true
+// @Success 200 {object} models.ResponseModel
+// @Failure 500 {object} models.ResponseModel
+// @Router /task/edit [post]
 func (h *TaskHandler) EditTask(ctx *fiber.Ctx) error {
 	var (
 		context_ = ctx.Context()
@@ -81,6 +99,15 @@ func (h *TaskHandler) EditTask(ctx *fiber.Ctx) error {
 	return ctx.SendStatus(fiber.StatusOK)
 }
 
+// CreateTask
+// @Summary CreateTask
+// @Description Create task
+// @ID create-task
+// @Produce json
+// @Param request body models.TaskWithAnswers true
+// @Success 200 {object} models.ResponseModel
+// @Failure 500 {object} models.ResponseModel
+// @Router /task/new [post]
 func (h *TaskHandler) CreateTask(ctx *fiber.Ctx) error {
 	var (
 		context_   = ctx.Context()

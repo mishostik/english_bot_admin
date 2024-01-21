@@ -20,6 +20,14 @@ func NewModuleHandler(useCase module.Usecase, taskUC task.Usecase) *ModuleHandle
 	}
 }
 
+// GetAllModules
+// @Summary GetAllModules
+// @Description Get all modules
+// @ID get all modules
+// @Produce json
+// @Success 200 {object} models.ModulesResponseModel
+// @Failure 500 {object} models.ModulesResponseModel
+// @Router /module/all [get]
 func (h *ModuleHandler) GetAllModules(ctx *fiber.Ctx) error {
 	var (
 		context_                              = ctx.Context()
@@ -36,6 +44,15 @@ func (h *ModuleHandler) GetAllModules(ctx *fiber.Ctx) error {
 	return ctx.Status(fiber.StatusOK).JSON(response)
 }
 
+// CreateModule
+// @Summary CreateModule
+// @Description Create module
+// @ID create-module
+// @Produce json
+// @Param request body models.NewModuleParams true
+// @Success 200 {object} models.ResponseModel
+// @Failure 500 {object} models.ResponseModel
+// @Router /module/new [post]
 func (h *ModuleHandler) CreateModule(ctx *fiber.Ctx) error {
 	var (
 		context_ = ctx.Context()
@@ -59,10 +76,19 @@ func (h *ModuleHandler) CreateModule(ctx *fiber.Ctx) error {
 	return ctx.Status(fiber.StatusOK).JSON(response)
 }
 
+// GetTasksByLvl
+// @Summary GetTasksByLvl
+// @Description Get tasks by level
+// @ID get-task-by-level
+// @Produce json
+// @Param request body models.ByLvl true
+// @Success 200 {object} models.TasksByLvlResponseModel
+// @Failure 500 {object} models.TasksByLvlResponseModel
+// @Router /module/task/by_lvl [post]
 func (h *ModuleHandler) GetTasksByLvl(ctx *fiber.Ctx) error {
 	var (
 		context_ = ctx.Context()
-		params   *models.ByLvl
+		params   models.ByLvl
 		response *models.TasksByLvlResponseModel = &models.TasksByLvlResponseModel{}
 		err      error
 	)
@@ -71,7 +97,7 @@ func (h *ModuleHandler) GetTasksByLvl(ctx *fiber.Ctx) error {
 		return ctx.SendStatus(fiber.StatusBadRequest)
 	}
 
-	tasksByLvl, err := h.taskUC.GetTasksByLvl(context_, params)
+	tasksByLvl, err := h.taskUC.GetTasksByLvl(context_, &params)
 	if err != nil {
 		response.Error = err.Error()
 		return ctx.Status(fiber.StatusInternalServerError).JSON(response)
@@ -82,6 +108,15 @@ func (h *ModuleHandler) GetTasksByLvl(ctx *fiber.Ctx) error {
 	return ctx.Status(fiber.StatusInternalServerError).JSON(response)
 }
 
+// AddTasksByLvl
+// @Summary AddTasksByLvl
+// @Description Add tasks to module by level
+// @ID add-task-by-lvl
+// @Produce json
+// @Param request body models.AddTaskByLvlParams true
+// @Success 200 {object} models.ResponseModel
+// @Failure 500 {object} models.ResponseModel
+// @Router /module/task/add [post]
 func (h *ModuleHandler) AddTasksByLvl(ctx *fiber.Ctx) error {
 	var (
 		params          models.AddTaskByLvlParams

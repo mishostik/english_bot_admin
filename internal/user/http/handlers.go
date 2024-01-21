@@ -16,6 +16,14 @@ func NewUserHandler(ucase user.Usecase) *UserHandler {
 	}
 }
 
+// GetAll
+// @Summary GetAll
+// @Description Get all users
+// @ID get-all-users
+// @Produce json
+// @Success 200 {object} models.UsersResponseModel
+// @Failure 500 {object} models.UsersResponseModel
+// @Router /user/all [get]
 func (h *UserHandler) GetAll(ctx *fiber.Ctx) error {
 	var (
 		context_                            = ctx.Context()
@@ -32,6 +40,15 @@ func (h *UserHandler) GetAll(ctx *fiber.Ctx) error {
 	return ctx.Status(fiber.StatusOK).JSON(response)
 }
 
+// AdminSignIn
+// @Summary AdminSignIn
+// @Description Admin sign in
+// @ID admin-sign-in
+// @Produce json
+// @Param request body models.AdminSignInParams true
+// @Success 200 {object} models.UsersResponseModel
+// @Failure 500 {object} models.ErrorResponseModel
+// @Router /user/admin/sign_in [post]
 func (h *UserHandler) AdminSignIn(ctx *fiber.Ctx) error {
 	var (
 		params   models.AdminSignInParams
@@ -57,6 +74,15 @@ func (h *UserHandler) AdminSignIn(ctx *fiber.Ctx) error {
 	return ctx.Status(fiber.StatusOK).JSON(response)
 }
 
+// AdminSignUp
+// @Summary AdminSignUp
+// @Description Admin sign in
+// @ID admin-sign-up
+// @Produce json
+// @Param request body models.AdminSignInParams true
+// @Success 200 {object} models.UsersResponseModel
+// @Failure 500 {object} models.ErrorResponseModel
+// @Router /user/admin/sign_up [post]
 func (h *UserHandler) AdminSignUp(ctx *fiber.Ctx) error {
 	var (
 		params   models.AdminSignInParams
