@@ -27,6 +27,12 @@ type NewRuleParams struct {
 	Topic    string    `json:"topic" bson:"topic"`
 }
 
+type RulesResponseModel struct {
+	Success bool   `json:"success"`
+	Error   string `json:"error"`
+	Data    []Rule `json:"data"`
+}
+
 type Module struct {
 	ModuleID uuid.UUID `json:"module_id" bson:"module_id"`
 	Title    string    `json:"title" bson:"title"`

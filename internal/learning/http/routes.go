@@ -8,5 +8,4 @@ func LearnRoutes(app *fiber.App, h *LearnHandler) {
 	ruleGroup := learnGroup.Group("/rule")
 	ruleGroup.Get("/all", h.AllRules)
 	ruleGroup.Post("/new", h.AddRule)
-	ruleGroup.Get("/new", h.GetNewRuleForm)
 }
