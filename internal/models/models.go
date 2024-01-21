@@ -52,11 +52,33 @@ type TaskToModule struct {
 }
 
 type Task struct {
-	TaskID   uuid.UUID `bson:"task_id"`
+	TaskID   uuid.UUID `bson:"task_id" json:"task_id,omitempty"`
 	TypeID   uint8     `bson:"type_id" json:"type_id"`
 	Level    string    `bson:"level" json:"level"`
 	Question string    `bson:"question" json:"question"`
 	Answer   string    `bson:"answer" json:"answer"`
+}
+
+type TaskWithAnswers struct {
+	TaskID   uuid.UUID `bson:"task_id" json:"task_id,omitempty"`
+	TypeID   uint8     `bson:"type_id" json:"type_id"`
+	Level    string    `bson:"level" json:"level"`
+	Question string    `bson:"question" json:"question"`
+	Answer   string    `bson:"answer" json:"answer"`
+	A        string    `bson:"a" json:"a"`
+	B        string    `bson:"b" json:"b"`
+	C        string    `bson:"c" json:"c"`
+}
+
+type TasksResponseModel struct {
+	Success bool   `json:"success"`
+	Error   string `json:"error"`
+	Data    []Task `json:"data"`
+}
+
+type ResponseModel struct {
+	Success bool   `json:"success"`
+	Error   string `json:"error"`
 }
 
 type ByModule struct {
